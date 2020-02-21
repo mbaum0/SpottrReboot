@@ -52,7 +52,7 @@ app.get("/", (req, res, next) => {
 });
 
 // ================== SELECT ALL ENDPOINTS =================== //
-app.get("/api/spottrsite", (req, res, next) => {
+app.get("/api/spottrsites", (req, res, next) => {
     database.selectall_SpottrSite((err, rows) => {
         if (err)
         {
@@ -63,7 +63,7 @@ app.get("/api/spottrsite", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglot", (req, res, next) => {
+app.get("/api/parkinglots", (req, res, next) => {
     database.selectall_ParkingLot((err, rows) => {
         if (err)
         {
@@ -74,7 +74,7 @@ app.get("/api/parkinglot", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrnode", (req, res, next) => {
+app.get("/api/spottrnodes", (req, res, next) => {
     database.selectall_SpottrNode((err, rows) => {
         if (err)
         {
@@ -85,7 +85,7 @@ app.get("/api/spottrnode", (req, res, next) => {
     })
 })
 
-app.get("/api/masternode", (req, res, next) => {
+app.get("/api/masternodes", (req, res, next) => {
     database.selectall_MasterNode((err, rows) => {
         if (err)
         {
@@ -96,7 +96,7 @@ app.get("/api/masternode", (req, res, next) => {
     })
 })
 
-app.get("/api/slavenode", (req, res, next) => {
+app.get("/api/slavenodes", (req, res, next) => {
     database.selectall_SlaveNode((err, rows) => {
         if (err)
         {
@@ -107,7 +107,7 @@ app.get("/api/slavenode", (req, res, next) => {
     })
 })
 
-app.get("/api/parkingspot", (req, res, next) => {
+app.get("/api/parkingspots", (req, res, next) => {
     database.selectall_ParkingSpot((err, rows) => {
         if (err)
         {
@@ -119,7 +119,7 @@ app.get("/api/parkingspot", (req, res, next) => {
 })
 
 // ================== SELECT ONE ENDPOINTS =================== //
-app.get("/api/spottrsite/:id", (req, res, next) => {
+app.get("/api/spottrsites/:id", (req, res, next) => {
     database.select_SpottrSite(req.params.id, (err, row) => {
         if (err)
         {
@@ -130,7 +130,7 @@ app.get("/api/spottrsite/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglot/:id", (req, res, next) => {
+app.get("/api/parkinglots/:id", (req, res, next) => {
     database.select_ParkingLot(req.params.id, (err, row) => {
         if (err)
         {
@@ -141,7 +141,7 @@ app.get("/api/parkinglot/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrnode/:id", (req, res, next) => {
+app.get("/api/spottrnodes/:id", (req, res, next) => {
     database.select_SpottrNode(req.params.id, (err, row) => {
         if (err)
         {
@@ -152,7 +152,7 @@ app.get("/api/spottrnode/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/masternode/:id", (req, res, next) => {
+app.get("/api/masternodes/:id", (req, res, next) => {
     database.select_MasterNode(req.params.id, (err, row) => {
         if (err)
         {
@@ -163,7 +163,7 @@ app.get("/api/masternode/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/slavenode/:id", (req, res, next) => {
+app.get("/api/slavenodes/:id", (req, res, next) => {
     database.select_SlaveNode(req.params.id, (err, row) => {
         if (err)
         {
@@ -174,7 +174,7 @@ app.get("/api/slavenode/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/parkingspot/:id", (req, res, next) => {
+app.get("/api/parkingspots/:id", (req, res, next) => {
     database.select_ParkingSpot(req.params.id, (err, row) => {
         if (err)
         {
@@ -187,7 +187,7 @@ app.get("/api/parkingspot/:id", (req, res, next) => {
 
 // ================ SELECT FILTER ENDPOINTS ================== //
 
-app.get("/api/spottrsite/:id/parkinglot", (req, res, next) => {
+app.get("/api/spottrsites/:id/parkinglots", (req, res, next) => {
     database.select_ParkingLotWithSpottrSite(req.params.id, (err, row) => {
         if (err)
         {
@@ -198,7 +198,7 @@ app.get("/api/spottrsite/:id/parkinglot", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglot/:id/spottrnode", (req, res, next) => {
+app.get("/api/parkinglots/:id/spottrnodes", (req, res, next) => {
     database.select_SpottrNodeWithParkingLot(req.params.id, (err, row) => {
         if (err)
         {
@@ -209,7 +209,7 @@ app.get("/api/parkinglot/:id/spottrnode", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglot/:id/masternode", (req, res, next) => {
+app.get("/api/parkinglots/:id/masternodes", (req, res, next) => {
     database.select_MasterNodeWithParkingLot(req.params.id, (err, row) => {
         if (err)
         {
@@ -220,7 +220,7 @@ app.get("/api/parkinglot/:id/masternode", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglot/:id/slavenode", (req, res, next) => {
+app.get("/api/parkinglots/:id/slavenodes", (req, res, next) => {
     database.select_SlaveNodeWithParkingLot(req.params.id, (err, row) => {
         if (err)
         {
@@ -231,7 +231,7 @@ app.get("/api/parkinglot/:id/slavenode", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglot/:id/parkingspot", (req, res, next) => {
+app.get("/api/parkinglots/:id/parkingspots", (req, res, next) => {
     database.select_ParkingSpotWithParkingLot(req.params.id, (err, row) => {
         if (err)
         {
@@ -242,7 +242,7 @@ app.get("/api/parkinglot/:id/parkingspot", (req, res, next) => {
     })
 })
 
-app.get("/api/masternode/:id/slavenode", (req, res, next) => {
+app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
     database.select_SlaveNodeWithMasterNode(req.params.id, (err, row) => {
         if (err)
         {
@@ -251,6 +251,11 @@ app.get("/api/masternode/:id/slavenode", (req, res, next) => {
         }
         res.json({SlaveNode: row})
     })
+})
+
+// Default error message
+app.get("/api/error", (req, res, next) => {
+    res.status(400).json({"error":"sample error message"})
 })
 
 // Default response for any other request
