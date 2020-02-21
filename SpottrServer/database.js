@@ -39,6 +39,9 @@ const CREATE_PARKINGSPOT_TABLE = `CREATE TABLE ParkingSpot (id INTEGER PRIMARY K
                                                             latitude REAL,
                                                             FOREIGN KEY (spottrnode) REFERENCES SpottrNode (id) ON DELETE CASCADE);`
 
+const CREATE_BASICLOG_TABLE = `CREATE TABLE BasicLog (id INTEGEGER PRIMARY KEY AUTOINCREMENT,
+                                                      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                                      note TEXT);`
 
 const INSERT_SPOTTRSITE = `INSERT INTO SpottrSite (sitename, address) VALUES (?, ?);`
 const INSERT_PARKINGLOT = `INSERT INTO ParkingLot (lotname, spottrsite, perimeter) VALUES (?, ?, ?);`
@@ -46,6 +49,8 @@ const INSERT_SPOTTRNODE = `INSERT INTO SpottrNode (nodename, parkinglot, locatio
 const INSERT_MASTERNODE = `INSERT INTO MasterNode (id, hostname) VALUES (?, ?);`
 const INSERT_SLAVENODE = `INSERT INTO SlaveNode (id, masternode) VALUES (?, ?);`
 const INSERT_PARKINGSPOT = `INSERT INTO ParkingSpot (spotname, spottrnode, sensornum, occupied, longitude, latitude) VALUES (?, ?, ?, ?, ?, ?);`
+
+const INSERT_BASICLOG = `INSERT INTO BasicLog (note) VALUES (?);`
 
 const UPDATE_SPOTTRSITE = `UPDATE SpottrSite SET sitename = COALESCE(?, sitename), address=COALESCE(?, address) WHERE id=?;`
 const UPDATE_PARKINGLOT = `UPDATE ParkingLot SET lotname=COALESCE(?,lotname), spottrsite=COALESCE(?, spottrsite), perimeter=COALESCE(?, perimeter) WHERE id=?;`
@@ -61,6 +66,8 @@ const SELECT_ALL_MASTERNODE = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON
 const SELECT_ALL_SLAVENODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id;`
 const SELECT_ALL_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id;`
 
+const SELECT_ALL_BASICLOG = `SELECT * FROM BasicLog;`
+
 const SELECT_SPOTTRSITE = `SELECT * FROM SpottrSite WHERE id=?;`
 const SELECT_PARKINGLOT = `SELECT * FROM ParkingLot WHERE id=?;`
 const SELECT_SPOTTRNODE = `SELECT * FROM SpottrNode WHERE id=?;`
@@ -73,12 +80,14 @@ const SELECT_SPOTTRNODE_WITH_PARKINGLOT = `SELECT * FROM SpottrNode WHERE parkin
 const SELECT_MASTERNODE_WITH_PARKINGLOT = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id WHERE parkinglot=?;`
 const SELECT_SLAVENODE_WITH_PARKINGLOT = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE parkinglot=?;`
 const SELECT_PARKINGSPOT_WITH_PARKINGLOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND n.parkinglot=?;`
-const SELECT_SLAVENODE_WITH_MASTERNODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE masternode=?`;
+const SELECT_SLAVENODE_WITH_MASTERNODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE masternode=?;`
 
 const DELETE_SPOTTRSITE = `DELETE FROM SpottrSite WHERE id=?;`
 const DELETE_PARKINGLOT = `DELETE FROM ParkingLot WHERE id=?;`
 const DELETE_SPOTTRNODE = `DELETE FROM SpottrNode WHERE id=?;`
 const DELETE_PARKINGSPOT = `DELETE FROM ParkingSpot WHERE id=?;`
+
+const DELETE_ALL_BASICLOG = `DELETE FROM BasicLog;`
 
 // Create database
 let db = new sqlite3.Database(DBPATH, (err) => {
@@ -135,6 +144,13 @@ exports.createTables = () => {
             console.log('Successfully created ParkingSpot table')
         }
     });
+    db.run(CREATE_BASICLOG_TABLE, (err) => {
+        if (err) {
+            console.log('BasicLog table already exists')
+        } else {
+            console.log('Successfully create BasicLog table')
+        }
+    })
 }
 
 // ===================== INSERT FUNCTIONS ===================== //
@@ -206,6 +222,10 @@ exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, 
     })
 }
 
+exports.insert_BasicLog = (note) => {
+    db.run(INSERT_BASICLOG, [note])
+}
+
 // ================== SELECT ALL FUNCTIONS =================== //
 exports.selectall_SpottrSite = (callback) => {
     db.all(SELECT_ALL_SPOTTRSITE, [], (err, rows) => {
@@ -244,6 +264,11 @@ exports.selectall_ParkingSpot = (callback) => {
     });
 }
 
+exports.selectall_BasicLog = (callback) => {
+    db.all(SELECT_ALL_BASICLOG, [], (err, rows) => {
+        callback(err, rows)
+    });
+}
 
 // ================== SELECT ONE FUNCTIONS =================== //
 exports.select_SpottrSite = (id, callback) => {
@@ -390,3 +415,4 @@ exports.update_ParkingSpot = (id, name, spottrnode, sensornum, occupied, longitu
         })
     })
 }
+
