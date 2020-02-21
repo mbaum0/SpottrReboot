@@ -242,6 +242,17 @@ app.get("/api/parkinglot/:id/parkingspot", (req, res, next) => {
     })
 })
 
+app.get("/api/masternode/:id/slavenode", (req, res, next) => {
+    database.select_SlaveNodeWithMasterNode(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({SlaveNode: row})
+    })
+})
+
 // Default response for any other request
 app.use((req, res) => {
     res.status(404)

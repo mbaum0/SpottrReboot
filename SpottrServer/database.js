@@ -57,8 +57,8 @@ const SELECT_ALL_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensorn
 const SELECT_SPOTTRSITE = `SELECT * FROM SpottrSite WHERE id=?;`
 const SELECT_PARKINGLOT = `SELECT * FROM ParkingLot WHERE id=?;`
 const SELECT_SPOTTRNODE = `SELECT * FROM SpottrNode WHERE id=?;`
-const SELECT_MASTERNODE = `SELECT * FROM MasterNode WHERE id=? INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id;`
-const SELECT_SLAVENODE = `SELECT * FROM SlaveNode WHERE id=? INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id;`
+const SELECT_MASTERNODE = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id WHERE MasterNode.id=?;`
+const SELECT_SLAVENODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id WHERE SlaveNode.id=?;`
 const SELECT_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND p.id=?;`
 
 const SELECT_PARKINGLOT_WITH_SPOTTRSITE = `SELECT * FROM ParkingLot WHERE spottrsite=?;`
@@ -66,7 +66,7 @@ const SELECT_SPOTTRNODE_WITH_PARKINGLOT = `SELECT * FROM SpottrNode WHERE parkin
 const SELECT_MASTERNODE_WITH_PARKINGLOT = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id WHERE parkinglot=?;`
 const SELECT_SLAVENODE_WITH_PARKINGLOT = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE parkinglot=?;`
 const SELECT_PARKINGSPOT_WITH_PARKINGLOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND n.parkinglot=?;`
-
+const SELECT_SLAVENODE_WITH_MASTERNODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE masternode=?`;
 
 // Create database
 let db = new sqlite3.Database(DBPATH, (err) => {
@@ -268,6 +268,12 @@ exports.select_SlaveNodeWithParkingLot = (parkinglot, callback) => {
 
 exports.select_ParkingSpotWithParkingLot = (parkinglot, callback) => {
     db.all(SELECT_PARKINGSPOT_WITH_PARKINGLOT, [parkinglot], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_SlaveNodeWithMasterNode = (masternode, callback) => {
+    db.all(SELECT_SLAVENODE_WITH_MASTERNODE, [masternode], (err, row) => {
         callback(err, row)
     })
 }
