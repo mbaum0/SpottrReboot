@@ -12,22 +12,22 @@ const CREATE_PARKINGLOT_TABLE = `CREATE TABLE ParkingLot (id INTEGER PRIMARY KEY
                                                           lotname TEXT,
                                                           spottrsite INTEGER,
                                                           perimeter TEXT,
-                                                          FOREIGN KEY (spottrsite) REFERENCES SpottrSite (id));`
+                                                          FOREIGN KEY (spottrsite) REFERENCES SpottrSite (id) ON DELETE CASCADE);`
 
 const CREATE_SPOTTRNODE_TABLE = `CREATE TABLE SpottrNode (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                           nodename TEXT,
                                                           parkinglot INTEGER,
                                                           location TEXT,
                                                           numsensors INTEGER,
-                                                          FOREIGN KEY (parkinglot) REFERENCES ParkingLot (id));`
+                                                          FOREIGN KEY (parkinglot) REFERENCES ParkingLot (id) ON DELETE CASCADE);`
 
 const CREATE_MASTERNODE_TABLE = `CREATE TABLE MasterNode (id INTEGER PRIMARY KEY,
                                                           hostname TEXT,
-                                                          FOREIGN KEY (id) REFERENCES SpottrNode (id));`
+                                                          FOREIGN KEY (id) REFERENCES SpottrNode (id) ON DELETE CASCADE);`
                                                         
 const CREATE_SLAVENODE_TABLE = `CREATE TABLE SlaveNode (id INTEGER PRIMARY KEY,
                                                         masternode INTEGER,
-                                                        FOREIGN KEY (id) REFERENCES SpottrNode (id),
+                                                        FOREIGN KEY (id) REFERENCES SpottrNode (id) ON DELETE CASCADE,
                                                         FOREIGN KEY (masternode) REFERENCES MasterNode (id));`
 
 const CREATE_PARKINGSPOT_TABLE = `CREATE TABLE ParkingSpot (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +37,7 @@ const CREATE_PARKINGSPOT_TABLE = `CREATE TABLE ParkingSpot (id INTEGER PRIMARY K
                                                             occupied INTEGER,
                                                             longitude REAL,
                                                             latitude REAL,
-                                                            FOREIGN KEY (spottrnode) REFERENCES SpottrNode (id));`
+                                                            FOREIGN KEY (spottrnode) REFERENCES SpottrNode (id) ON DELETE CASCADE);`
 
 
 const INSERT_SPOTTRSITE = `INSERT INTO SpottrSite (sitename, address) VALUES (?, ?);`
@@ -67,6 +67,11 @@ const SELECT_MASTERNODE_WITH_PARKINGLOT = `SELECT * FROM MasterNode INNER JOIN S
 const SELECT_SLAVENODE_WITH_PARKINGLOT = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE parkinglot=?;`
 const SELECT_PARKINGSPOT_WITH_PARKINGLOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND n.parkinglot=?;`
 const SELECT_SLAVENODE_WITH_MASTERNODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE masternode=?`;
+
+const DELETE_SPOTTRSITE = `DELETE FROM SpottrSite WHERE id=?;`
+const DELETE_PARKINGLOT = `DELETE FROM ParkingLot WHERE id=?;`
+const DELETE_SPOTTRNODE = `DELETE FROM SpottrNode WHERE id=?;`
+const DELETE_PARKINGSPOT = `DELETE FROM ParkingSpot WHERE id=?;`
 
 // Create database
 let db = new sqlite3.Database(DBPATH, (err) => {
@@ -305,5 +310,29 @@ exports.select_ParkingSpotWithParkingLot = (parkinglot, callback) => {
 exports.select_SlaveNodeWithMasterNode = (masternode, callback) => {
     db.all(SELECT_SLAVENODE_WITH_MASTERNODE, [masternode], (err, row) => {
         callback(err, row)
+    })
+}
+
+// ===================== DELETE FUNCTIONS ===================== //
+exports.delete_SpottrSite = (id, callback) => {
+    db.run(DELETE_SPOTTRSITE, [id], function (err) {
+        callback(err, this.changes)
+    })
+}
+
+exports.delete_ParkingLot = (id, callback) => {
+    db.run(DELETE_PARKINGLOT, [id], function (err) {
+        callback(err, this.changes)
+    })
+}
+
+exports.delete_SpottrNode = (id, callback) => {
+    db.run(DELETE_SPOTTRNODE, [id], function (err) {
+        callback(err, this.changes)
+    })
+}
+exports.delete_ParkingSpot = (id, callback) => {
+    db.run(DELETE_PARKINGSPOT, [id], function (err) {
+        callback(err, this.changes)
     })
 }

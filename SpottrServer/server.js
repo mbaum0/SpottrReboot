@@ -62,7 +62,7 @@ app.get("/api/spottrsites", (req, res, next) => {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({SpottrSite: rows})
+        res.json({SpottrSites: rows})
     })
 })
 
@@ -73,7 +73,7 @@ app.get("/api/parkinglots", (req, res, next) => {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({ParkingLot: rows})
+        res.json({ParkingLots: rows})
     })
 })
 
@@ -84,7 +84,7 @@ app.get("/api/spottrnodes", (req, res, next) => {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({SpottrNode: rows})
+        res.json({SpottrNodes: rows})
     })
 })
 
@@ -95,7 +95,7 @@ app.get("/api/masternodes", (req, res, next) => {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({MasterNode: rows})
+        res.json({MasterNodes: rows})
     })
 })
 
@@ -106,7 +106,7 @@ app.get("/api/slavenodes", (req, res, next) => {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({SlaveNode: rows})
+        res.json({SlaveNodes: rows})
     })
 })
 
@@ -117,7 +117,7 @@ app.get("/api/parkingspots", (req, res, next) => {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({ParkingSpot: rows})
+        res.json({ParkingSpots: rows})
     })
 })
 
@@ -259,31 +259,113 @@ app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
 // ==================== INSERT ENDPOINTS ===================== //
 app.post("/api/spottrsites", (req, res, next) => {
     database.insert_SpottrSite(req.body.sitename, req.body.address, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
         res.json(row)
     })
 })
 
 app.post("/api/parkinglot", (req, res, next) => {
     database.insert_ParkingLot(req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
         res.json(row)
     })
 })
 
 app.post("/api/masternodes", (req, res, next) => {
     database.insert_MasterNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.hostname, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
         res.json(row)
     })
 })
 
 app.post("/api/slavenodes", (req, res, next) => {
     database.insert_SlaveNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.masternode, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
         res.json(row)
     })
 })
 
 app.post("/api/parkingspots", (req, res, next) => {
     database.insert_ParkingSpot(req.body.spotname, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
         res.json(row)
+    })
+})
+
+// ==================== DELETE ENDPOINTS ===================== //
+app.delete("/api/spottrsites/:id", (req, res, next) => {
+    database.delete_SpottrSite(req.params.id, (err, changes) => {
+        if (err) {
+            res.status(400).json({"error": err.message})
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
+    })
+})
+
+app.delete("/api/parkinglots/:id", (req, res, next) => {
+    database.delete_ParkingLot(req.params.id, (err, changes) => {
+        if (err) {
+            res.status(400).json({"error": err.message})
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
+    })
+})
+
+app.delete("/api/spottrnodes/:id", (req, res, next) => {
+    database.delete_SpottrNode(req.params.id, (err, changes) => {
+        if (err) {
+            res.status(400).json({"error": err.message})
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
+    })
+})
+
+app.delete("/api/parkingspots/:id", (req, res, next) => {
+    database.delete_ParkingSpot(req.params.id, (err, changes) => {
+        if (err) {
+            res.status(400).json({"error": err.message})
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
     })
 })
 
