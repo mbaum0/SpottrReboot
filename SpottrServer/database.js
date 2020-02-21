@@ -126,42 +126,72 @@ exports.createTables = () => {
 }
 
 // ===================== INSERT FUNCTIONS ===================== //
-exports.insert_SpottrSite = (name, address) => {
-    db.run(INSERT_SPOTTRSITE, [name, address], (err) => {
-        return err;
+exports.insert_SpottrSite = (name, address, callback) => {
+    db.run(INSERT_SPOTTRSITE, [name, address], function (err) {
+        exports.select_SpottrSite(this.lastID, (err, row) => {
+            callback(err, row)
+        })
     })
 }
 
-exports.insert_ParkingLot = (lotname, spottrsite, perimeter) => {
-    db.run(INSERT_PARKINGLOT, [lotname, spottrsite, perimeter])
+exports.insert_ParkingLot = (lotname, spottrsite, perimeter, callback) => {
+    db.run(INSERT_PARKINGLOT, [lotname, spottrsite, perimeter], function (err) {
+        exports.select_ParkingLot(this.lastID, (err, row) => {
+            callback(err, row)
+        })
+    })
 }
 
-exports.insert_SpottrNode = (name, parkinglot, location, numsensors) => {
-    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors])
-}
-
-exports.insert_MasterNode = (id, hostname) => {
-    db.run(INSERT_MASTERNODE, [id, hostname])
-}
-
-exports.insert_SlaveNode = (id, masternode) => {
-    db.run(INSERT_SLAVENODE, [id, masternode])
-}
-
-exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hostname) => {
+exports.insert_SpottrNode = (name, parkinglot, location, numsensors, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
-        db.run(INSERT_MASTERNODE, [this.lastID, hostname])
+        exports.select_SpottrNode(this.lastID, (err, row) => {
+            callback(err, row)
+        })
     })
 }
 
-exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, masternode) => {
+exports.insert_MasterNode = (id, hostname, callback) => {
+    db.run(INSERT_MASTERNODE, [id, hostname], function (err) {
+        exports.select_MasterNode(this.lastID, (err, row) => {
+            callback(err, row)
+        })
+    })
+}
+
+exports.insert_SlaveNode = (id, masternode, callback) => {
+    db.run(INSERT_SLAVENODE, [id, masternode], function (err) {
+        exports.select_SlaveNode(this.lastID, (err, row) => {
+            callback(err, row)
+        })
+    })
+}
+
+exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hostname, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
-        db.run(INSERT_SLAVENODE, [this.lastID, masternode])
+        db.run(INSERT_MASTERNODE, [this.lastID, hostname], function (err) {
+            exports.select_MasterNode(this.lastID, (err, row) => {
+                callback(err, row)
+            })
+        })
     })
 }
 
-exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, latitude) => {
-    db.run(INSERT_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude])
+exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, masternode, callback) => {
+    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+        db.run(INSERT_SLAVENODE, [this.lastID, masternode], function (err) {
+            exports.select_SlaveNode(this.lastID, (err, row) => {
+                callback(err, row)
+            })
+        })
+    })
+}
+
+exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, latitude, callback) => {
+    db.run(INSERT_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude], function (err) {
+        exports.select_ParkingSpot(this.lastID, (err, row) => {
+            callback(err, row)
+        })
+    })
 }
 
 // ================== SELECT ALL FUNCTIONS =================== //

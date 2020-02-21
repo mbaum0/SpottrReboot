@@ -1,5 +1,8 @@
 var express = require("express")
+const bodyparser = require("body-parser")
+
 var app = express()
+app.use(bodyparser.urlencoded({ extended: true}))
 
 var database = require("./database.js")
 
@@ -250,6 +253,31 @@ app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
             return
         }
         res.json({SlaveNode: row})
+    })
+})
+
+// ==================== INSERT ENDPOINTS ===================== //
+app.post("/api/spottrsites", (req, res, next) => {
+    database.insert_SpottrSite(req.body.sitename, req.body.address, (err, row) => {
+        res.json(row)
+    })
+})
+
+app.post("/api/masternodes", (req, res, next) => {
+    database.insert_MasterNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.hostname, (err, row) => {
+        res.json(row)
+    })
+})
+
+app.post("/api/slavenodes", (req, res, next) => {
+    database.insert_SlaveNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.masternode, (err, row) => {
+        res.json(row)
+    })
+})
+
+app.post("/api/parkingspots", (req, res, next) => {
+    database.insert_ParkingSpot(req.body.spotname, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
+        res.json(row)
     })
 })
 

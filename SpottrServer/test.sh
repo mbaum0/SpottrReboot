@@ -29,6 +29,10 @@ get_tests=(
     parkingspots
 )
 
+post_tests=(
+    ["spottrsites"]="{'sitename':'testsite', 'address':'1 testsite drive'}"
+)
+
 # test the error case
 resp=$(curl -s -X "GET" http://${HOSTNAME}:${PORT}/api/error)
     if [[ $resp != *"error"* ]]; then
@@ -37,11 +41,11 @@ resp=$(curl -s -X "GET" http://${HOSTNAME}:${PORT}/api/error)
         printf "${GREEN}[PASSED]${NOCOLOR}"
     fi
 
-    printf " Test error case\n"
+    printf " Test [GET] error case\n"
 
 # test the GET cases. these should all pass
 for i in "${get_tests[@]}"; do
-    resp=$(curl -s -X "GET" http://${HOSTNAME}:${PORT}/api/"$i")
+    resp=$(curl -s -X "GET" http://${HOSTNAME}:${PORT}/api/$i)
 
     if [[ $resp == *"error"* ]]; then
         printf "${RED}[FAILED]${NOCOLOR}"
@@ -49,6 +53,18 @@ for i in "${get_tests[@]}"; do
         printf "${GREEN}[PASSED]${NOCOLOR}"
     fi
 
-    printf " Test ${i}\n"
+    printf " Test [GET] ${i}\n"
+done
 
+# this test is borked, pls fix
+for i in "${!post_tests[@]}"; do
+    resp=$(curl -s --header "Content-Type: application/json" --request POST --data ${post_tests[$i]} http://${HOSTNAME}:${PORT}/api/$i)
+
+    if [[ $resp == *"error"* ]]; then
+        printf "${RED}[FAILED]${NOCOLOR}"
+    else
+        printf "${GREEN}[PASSED]${NOCOLOR}"
+    fi
+
+    printf " Test [POST] ${i}\n"
 done
