@@ -24,7 +24,7 @@ const CREATE_SPOTTRNODE_TABLE = `CREATE TABLE SpottrNode (id INTEGER PRIMARY KEY
 const CREATE_MASTERNODE_TABLE = `CREATE TABLE MasterNode (id INTEGER PRIMARY KEY,
                                                           hostname TEXT,
                                                           FOREIGN KEY (id) REFERENCES SpottrNode (id) ON DELETE CASCADE);`
-                                                        
+
 const CREATE_SLAVENODE_TABLE = `CREATE TABLE SlaveNode (id INTEGER PRIMARY KEY,
                                                         masternode INTEGER,
                                                         FOREIGN KEY (id) REFERENCES SpottrNode (id) ON DELETE CASCADE,

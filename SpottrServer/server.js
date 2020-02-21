@@ -8,7 +8,7 @@ var database = require("./database.js")
 
 var HTTP_PORT = 8000
 
-database.createTables( () => {});
+database.createTables(() => { });
 
 
 app.listen(HTTP_PORT, () => {
@@ -16,7 +16,7 @@ app.listen(HTTP_PORT, () => {
 });
 
 app.get("/", (req, res, next) => {
-    res.json({"message": "Shit Works!"})
+    res.json({ "message": "Shit Works!" })
     database.insert_SpottrSite("RIT", "1 Lomb Memorial Drive")
 
     database.insert_ParkingLot("CARLSON LOWER", 1, "[]")
@@ -32,7 +32,7 @@ app.get("/", (req, res, next) => {
     database.insert_SlaveNodeComplete("SLAVE4", 2, "TOP LEFT", 3, 2)
     database.insert_SlaveNodeComplete("SLAVE5", 2, "TOP CENTER", 3, 2)
     database.insert_SlaveNodeComplete("SLAVE6", 2, "TOP RIGHT", 3, 2)
-    
+
     database.insert_ParkingSpot("a0", 1, 0, 0, 76.01, 81.01)
     database.insert_ParkingSpot("a1", 1, 1, 0, 76.01, 81.01)
     database.insert_ParkingSpot("a2", 1, 2, 0, 76.01, 81.01)
@@ -57,134 +57,122 @@ app.get("/", (req, res, next) => {
 // ================== SELECT ALL ENDPOINTS =================== //
 app.get("/api/spottrsites", (req, res, next) => {
     database.selectall_SpottrSite((err, rows) => {
-        if (err)
-        {
-            res.status(400).json({"error":err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SpottrSites: rows})
+        res.json({ SpottrSites: rows })
     })
 })
 
 app.get("/api/parkinglots", (req, res, next) => {
     database.selectall_ParkingLot((err, rows) => {
-        if (err)
-        {
-            res.status(400).json({"error":err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({ParkingLots: rows})
+        res.json({ ParkingLots: rows })
     })
 })
 
 app.get("/api/spottrnodes", (req, res, next) => {
     database.selectall_SpottrNode((err, rows) => {
-        if (err)
-        {
-            res.status(400).json({"error":err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SpottrNodes: rows})
+        res.json({ SpottrNodes: rows })
     })
 })
 
 app.get("/api/masternodes", (req, res, next) => {
     database.selectall_MasterNode((err, rows) => {
-        if (err)
-        {
-            res.status(400).json({"error":err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({MasterNodes: rows})
+        res.json({ MasterNodes: rows })
     })
 })
 
 app.get("/api/slavenodes", (req, res, next) => {
     database.selectall_SlaveNode((err, rows) => {
-        if (err)
-        {
-            res.status(400).json({"error":err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SlaveNodes: rows})
+        res.json({ SlaveNodes: rows })
     })
 })
 
 app.get("/api/parkingspots", (req, res, next) => {
     database.selectall_ParkingSpot((err, rows) => {
-        if (err)
-        {
-            res.status(400).json({"error":err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({ParkingSpots: rows})
+        res.json({ ParkingSpots: rows })
     })
 })
 
 // ================== SELECT ONE ENDPOINTS =================== //
 app.get("/api/spottrsites/:id", (req, res, next) => {
     database.select_SpottrSite(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SpottrSite: row})
+        res.json({ SpottrSite: row })
     })
 })
 
 app.get("/api/parkinglots/:id", (req, res, next) => {
     database.select_ParkingLot(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({ParkingLot: row})
+        res.json({ ParkingLot: row })
     })
 })
 
 app.get("/api/spottrnodes/:id", (req, res, next) => {
     database.select_SpottrNode(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SpottrNode: row})
+        res.json({ SpottrNode: row })
     })
 })
 
 app.get("/api/masternodes/:id", (req, res, next) => {
     database.select_MasterNode(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({MasterNode: row})
+        res.json({ MasterNode: row })
     })
 })
 
 app.get("/api/slavenodes/:id", (req, res, next) => {
     database.select_SlaveNode(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SlaveNode: row})
+        res.json({ SlaveNode: row })
     })
 })
 
 app.get("/api/parkingspots/:id", (req, res, next) => {
     database.select_ParkingSpot(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({ParkingSpot: row})
+        res.json({ ParkingSpot: row })
     })
 })
 
@@ -192,76 +180,69 @@ app.get("/api/parkingspots/:id", (req, res, next) => {
 
 app.get("/api/spottrsites/:id/parkinglots", (req, res, next) => {
     database.select_ParkingLotWithSpottrSite(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({ParkingLot: row})
+        res.json({ ParkingLot: row })
     })
 })
 
 app.get("/api/parkinglots/:id/spottrnodes", (req, res, next) => {
     database.select_SpottrNodeWithParkingLot(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SpottrNode: row})
+        res.json({ SpottrNode: row })
     })
 })
 
 app.get("/api/parkinglots/:id/masternodes", (req, res, next) => {
     database.select_MasterNodeWithParkingLot(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({MasterNode: row})
+        res.json({ MasterNode: row })
     })
 })
 
 app.get("/api/parkinglots/:id/slavenodes", (req, res, next) => {
     database.select_SlaveNodeWithParkingLot(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SlaveNode: row})
+        res.json({ SlaveNode: row })
     })
 })
 
 app.get("/api/parkinglots/:id/parkingspots", (req, res, next) => {
     database.select_ParkingSpotWithParkingLot(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({ParkingSpot: row})
+        res.json({ ParkingSpot: row })
     })
 })
 
 app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
     database.select_SlaveNodeWithMasterNode(req.params.id, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
-        res.json({SlaveNode: row})
+        res.json({ SlaveNode: row })
     })
 })
 
 // ==================== INSERT ENDPOINTS ===================== //
 app.post("/api/spottrsites", (req, res, next) => {
     database.insert_SpottrSite(req.body.sitename, req.body.address, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
         res.json(row)
@@ -270,9 +251,8 @@ app.post("/api/spottrsites", (req, res, next) => {
 
 app.post("/api/parkinglot", (req, res, next) => {
     database.insert_ParkingLot(req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
         res.json(row)
@@ -281,9 +261,8 @@ app.post("/api/parkinglot", (req, res, next) => {
 
 app.post("/api/masternodes", (req, res, next) => {
     database.insert_MasterNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.hostname, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
         res.json(row)
@@ -292,9 +271,8 @@ app.post("/api/masternodes", (req, res, next) => {
 
 app.post("/api/slavenodes", (req, res, next) => {
     database.insert_SlaveNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.masternode, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
         res.json(row)
@@ -303,9 +281,8 @@ app.post("/api/slavenodes", (req, res, next) => {
 
 app.post("/api/parkingspots", (req, res, next) => {
     database.insert_ParkingSpot(req.body.spotname, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
-        if (err)
-        {
-            res.status(400).json({"error": err.message})
+        if (err) {
+            res.status(400).json({ "error": err.message })
             return
         }
         res.json(row)
@@ -316,7 +293,7 @@ app.post("/api/parkingspots", (req, res, next) => {
 app.delete("/api/spottrsites/:id", (req, res, next) => {
     database.delete_SpottrSite(req.params.id, (err, changes) => {
         if (err) {
-            res.status(400).json({"error": err.message})
+            res.status(400).json({ "error": err.message })
         }
         else if (changes == 0) {
             res.status(404).json()
@@ -330,7 +307,7 @@ app.delete("/api/spottrsites/:id", (req, res, next) => {
 app.delete("/api/parkinglots/:id", (req, res, next) => {
     database.delete_ParkingLot(req.params.id, (err, changes) => {
         if (err) {
-            res.status(400).json({"error": err.message})
+            res.status(400).json({ "error": err.message })
         }
         else if (changes == 0) {
             res.status(404).json()
@@ -344,7 +321,7 @@ app.delete("/api/parkinglots/:id", (req, res, next) => {
 app.delete("/api/spottrnodes/:id", (req, res, next) => {
     database.delete_SpottrNode(req.params.id, (err, changes) => {
         if (err) {
-            res.status(400).json({"error": err.message})
+            res.status(400).json({ "error": err.message })
         }
         else if (changes == 0) {
             res.status(404).json()
@@ -358,7 +335,7 @@ app.delete("/api/spottrnodes/:id", (req, res, next) => {
 app.delete("/api/parkingspots/:id", (req, res, next) => {
     database.delete_ParkingSpot(req.params.id, (err, changes) => {
         if (err) {
-            res.status(400).json({"error": err.message})
+            res.status(400).json({ "error": err.message })
         }
         else if (changes == 0) {
             res.status(404).json()
@@ -371,7 +348,7 @@ app.delete("/api/parkingspots/:id", (req, res, next) => {
 
 // Default error message
 app.get("/api/error", (req, res, next) => {
-    res.status(400).json({"error":"sample error message"})
+    res.status(400).json({ "error": "sample error message" })
 })
 
 // Default response for any other request
