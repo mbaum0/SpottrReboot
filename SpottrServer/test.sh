@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This script tries every endpoint of the API and reports whether the operation succeeded or failed.
+# Currently failure status is reported by the API returning a failure message. This should probably
+# be expanded upon
+
 # colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -29,8 +33,15 @@ get_tests=(
     parkingspots
 )
 
+# these are failing due to some error where the entire value isnt being sent. this gives a json formatting
+# error
+declare -A post_tests
 post_tests=(
-    ["spottrsites"]="{'sitename':'testsite', 'address':'1 testsite drive'}"
+    ["spottrsites"]="{\"sitename\":\"testsite\",\"address\":\"1 testsite drive\"}"
+    ["parkinglots"]='{"lotname":"testlot", "spottrsite":"0", "perimeter":"[]"}'
+    ["masternodes"]='["nodename": "testmasternode", "parkinglot": "0", "location":"testlocation", "numsensors": "3", "hostname": "testhost"}'
+    ["slavenodes"]='["nodename": "testmasternode", "parkinglot": "0", "location":"testlocation", "numsensors": "3", "masternode": "0"}'
+    ["parkingspots"]='["spotname": "testspot", "spottrnode": 0, "sensornum": 3, "occupied": 0, "longitude": 76.6, "latitude": 50.1]'
 )
 
 # test the error case
@@ -53,14 +64,14 @@ for i in "${get_tests[@]}"; do
         printf "${GREEN}[PASSED]${NOCOLOR}"
     fi
 
-    printf " Test [GET] ${i}\n"
+    printf " Test [GET] $i\n"
 done
 
-# this test is borked, pls fix
+# test the POST cases. these should all pass
 for i in "${!post_tests[@]}"; do
     resp=$(curl -s --header "Content-Type: application/json" --request POST --data ${post_tests[$i]} http://${HOSTNAME}:${PORT}/api/$i)
 
-    if [[ $resp == *"error"* ]]; then
+    if [[ $resp == *"Error"* ]]; then
         printf "${RED}[FAILED]${NOCOLOR}"
     else
         printf "${GREEN}[PASSED]${NOCOLOR}"

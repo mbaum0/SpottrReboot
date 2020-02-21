@@ -2,7 +2,7 @@ var express = require("express")
 const bodyparser = require("body-parser")
 
 var app = express()
-app.use(bodyparser.urlencoded({ extended: true}))
+app.use(bodyparser.json())
 
 var database = require("./database.js")
 
@@ -259,6 +259,12 @@ app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
 // ==================== INSERT ENDPOINTS ===================== //
 app.post("/api/spottrsites", (req, res, next) => {
     database.insert_SpottrSite(req.body.sitename, req.body.address, (err, row) => {
+        res.json(row)
+    })
+})
+
+app.post("/api/parkinglot", (req, res, next) => {
+    database.insert_ParkingLot(req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
         res.json(row)
     })
 })
