@@ -39,9 +39,13 @@ const CREATE_PARKINGSPOT_TABLE = `CREATE TABLE ParkingSpot (id INTEGER PRIMARY K
                                                             latitude REAL,
                                                             FOREIGN KEY (spottrnode) REFERENCES SpottrNode (id) ON DELETE CASCADE);`
 
-const CREATE_BASICLOG_TABLE = `CREATE TABLE BasicLog (id INTEGEGER PRIMARY KEY AUTOINCREMENT,
-                                                      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                                                      note TEXT);`
+const CREATE_DBLOG_TABLE = `CREATE TABLE DbLog (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                                event TEXT,
+                                                type TEXT,
+                                                res_num INTEGER,
+                                                error INTEGER,
+                                                note TEXT);`
 
 const INSERT_SPOTTRSITE = `INSERT INTO SpottrSite (sitename, address) VALUES (?, ?);`
 const INSERT_PARKINGLOT = `INSERT INTO ParkingLot (lotname, spottrsite, perimeter) VALUES (?, ?, ?);`
@@ -50,7 +54,7 @@ const INSERT_MASTERNODE = `INSERT INTO MasterNode (id, hostname) VALUES (?, ?);`
 const INSERT_SLAVENODE = `INSERT INTO SlaveNode (id, masternode) VALUES (?, ?);`
 const INSERT_PARKINGSPOT = `INSERT INTO ParkingSpot (spotname, spottrnode, sensornum, occupied, longitude, latitude) VALUES (?, ?, ?, ?, ?, ?);`
 
-const INSERT_BASICLOG = `INSERT INTO BasicLog (note) VALUES (?);`
+const INSERT_DBLOG = `INSERT INTO DbLog (event, type, res_num, error, note) VALUES (?, ?, ?, ?, ?);`
 
 const UPDATE_SPOTTRSITE = `UPDATE SpottrSite SET sitename = COALESCE(?, sitename), address=COALESCE(?, address) WHERE id=?;`
 const UPDATE_PARKINGLOT = `UPDATE ParkingLot SET lotname=COALESCE(?,lotname), spottrsite=COALESCE(?, spottrsite), perimeter=COALESCE(?, perimeter) WHERE id=?;`
@@ -66,7 +70,7 @@ const SELECT_ALL_MASTERNODE = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON
 const SELECT_ALL_SLAVENODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id;`
 const SELECT_ALL_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id;`
 
-const SELECT_ALL_BASICLOG = `SELECT * FROM BasicLog;`
+const SELECT_ALL_DBLOG = `SELECT * FROM DbLog;`
 
 const SELECT_SPOTTRSITE = `SELECT * FROM SpottrSite WHERE id=?;`
 const SELECT_PARKINGLOT = `SELECT * FROM ParkingLot WHERE id=?;`
@@ -87,7 +91,7 @@ const DELETE_PARKINGLOT = `DELETE FROM ParkingLot WHERE id=?;`
 const DELETE_SPOTTRNODE = `DELETE FROM SpottrNode WHERE id=?;`
 const DELETE_PARKINGSPOT = `DELETE FROM ParkingSpot WHERE id=?;`
 
-const DELETE_ALL_BASICLOG = `DELETE FROM BasicLog;`
+const DELETE_ALL_DBLOG = `DELETE FROM DbLog;`
 
 // Create database
 let db = new sqlite3.Database(DBPATH, (err) => {
@@ -144,11 +148,11 @@ exports.createTables = () => {
             console.log('Successfully created ParkingSpot table')
         }
     });
-    db.run(CREATE_BASICLOG_TABLE, (err) => {
+    db.run(CREATE_DBLOG_TABLE, (err) => {
         if (err) {
-            console.log('BasicLog table already exists')
+            console.log('DbLog table already exists')
         } else {
-            console.log('Successfully create BasicLog table')
+            console.log('Successfully create DbLog table')
         }
     })
 }
@@ -156,6 +160,7 @@ exports.createTables = () => {
 // ===================== INSERT FUNCTIONS ===================== //
 exports.insert_SpottrSite = (name, address, callback) => {
     db.run(INSERT_SPOTTRSITE, [name, address], function (err) {
+        insert_DbLog("INSERT", "SpottrSite", this.lastID, err, null)
         exports.select_SpottrSite(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -164,6 +169,7 @@ exports.insert_SpottrSite = (name, address, callback) => {
 
 exports.insert_ParkingLot = (lotname, spottrsite, perimeter, callback) => {
     db.run(INSERT_PARKINGLOT, [lotname, spottrsite, perimeter], function (err) {
+        insert_DbLog("INSERT", "ParkingLot", this.lastID, err, null)
         exports.select_ParkingLot(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -172,6 +178,7 @@ exports.insert_ParkingLot = (lotname, spottrsite, perimeter, callback) => {
 
 exports.insert_SpottrNode = (name, parkinglot, location, numsensors, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+        insert_DbLog("INSERT", "SpottrNode", this.lastID, err, null)
         exports.select_SpottrNode(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -180,6 +187,7 @@ exports.insert_SpottrNode = (name, parkinglot, location, numsensors, callback) =
 
 exports.insert_MasterNode = (id, hostname, callback) => {
     db.run(INSERT_MASTERNODE, [id, hostname], function (err) {
+        insert_DbLog("INSERT", "MasterNode", this.lastID, err, null)
         exports.select_MasterNode(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -188,6 +196,7 @@ exports.insert_MasterNode = (id, hostname, callback) => {
 
 exports.insert_SlaveNode = (id, masternode, callback) => {
     db.run(INSERT_SLAVENODE, [id, masternode], function (err) {
+        insert_DbLog("INSERT", "SlaveNode", this.lastID, err, null)
         exports.select_SlaveNode(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -196,7 +205,9 @@ exports.insert_SlaveNode = (id, masternode, callback) => {
 
 exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hostname, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+        insert_DbLog("INSERT", "SpottrNode", this.lastID, err, null)
         db.run(INSERT_MASTERNODE, [this.lastID, hostname], function (err) {
+            insert_DbLog("INSERT", "MasterNode", this.lastID, err, null)
             exports.select_MasterNode(this.lastID, (err, row) => {
                 callback(err, row)
             })
@@ -206,7 +217,9 @@ exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hos
 
 exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, masternode, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+        insert_DbLog("INSERT", "SpottNode", this.lastID, err, null)
         db.run(INSERT_SLAVENODE, [this.lastID, masternode], function (err) {
+            insert_DbLog("INSERT", "SlaveNode", this.lastID, err, null)
             exports.select_SlaveNode(this.lastID, (err, row) => {
                 callback(err, row)
             })
@@ -216,14 +229,16 @@ exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, mast
 
 exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, latitude, callback) => {
     db.run(INSERT_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude], function (err) {
+        insert_DbLog("INSERT", "ParkingSpot", this.lastID, err, null)
         exports.select_ParkingSpot(this.lastID, (err, row) => {
             callback(err, row)
         })
     })
 }
 
-exports.insert_BasicLog = (note) => {
-    db.run(INSERT_BASICLOG, [note])
+// non-export because db log can only be created here
+function insert_DbLog(event, type, res_num, error, note) {
+    db.run(INSERT_DBLOG, [event, type, res_num, error, note])
 }
 
 // ================== SELECT ALL FUNCTIONS =================== //
@@ -264,8 +279,8 @@ exports.selectall_ParkingSpot = (callback) => {
     });
 }
 
-exports.selectall_BasicLog = (callback) => {
-    db.all(SELECT_ALL_BASICLOG, [], (err, rows) => {
+exports.selectall_DbLog = (callback) => {
+    db.all(SELECT_ALL_DBLOG, [], (err, rows) => {
         callback(err, rows)
     });
 }
@@ -348,32 +363,41 @@ exports.select_SlaveNodeWithMasterNode = (masternode, callback) => {
 // ===================== DELETE FUNCTIONS ===================== //
 exports.delete_SpottrSite = (id, callback) => {
     db.run(DELETE_SPOTTRSITE, [id], function (err) {
+        insert_DbLog("DELETE", "SpottrSite", this.lastID, err, null)
         callback(err, this.changes)
     })
 }
 
 exports.delete_ParkingLot = (id, callback) => {
     db.run(DELETE_PARKINGLOT, [id], function (err) {
+        insert_DbLog("DELETE", "ParkingLot", this.lastID, err, null)
         callback(err, this.changes)
     })
 }
 
 exports.delete_SpottrNode = (id, callback) => {
     db.run(DELETE_SPOTTRNODE, [id], function (err) {
+        insert_DbLog("DELETE", "SpottrNode", this.lastID, err, null)
         callback(err, this.changes)
     })
 }
 exports.delete_ParkingSpot = (id, callback) => {
     db.run(DELETE_PARKINGSPOT, [id], function (err) {
+        insert_DbLog("DELETE", "ParkingSpot", this.lastID, err, null)
+        callback(err, this.changes)
+    })
+}
+
+exports.delete_DbLog = (callback) => {
+    db.run(DELETE_ALL_DBLOG, [], function (err) {
         callback(err, this.changes)
     })
 }
 
 // ===================== UPDATE FUNCTIONS ===================== //
 exports.update_SpottrSite = (id, sitename, address, callback) => {
-    db.run("BEGIN")
-    db.run(UPDATE_SPOTTRSITE, [sitename, address, id], () => {
-        db.run("commit")
+    db.run(UPDATE_SPOTTRSITE, [sitename, address, id], (err) => {
+        insert_DbLog("UPDATE", "SpottrSite", this.lastID, err, `sitename: ${sitename}, address: ${address}`)
         exports.select_SpottrSite(id, (err, row) => {
             callback(err, row)
         })
@@ -381,7 +405,8 @@ exports.update_SpottrSite = (id, sitename, address, callback) => {
 }
 
 exports.update_ParkingLot = (id, lotname, spottrsite, perimeter, callback) => {
-    db.run(UPDATE_PARKINGLOT, [lotname, spottrsite, perimeter, id], function (err) {
+    insert_DbLog("UPDATE", "ParkingLot", this.lastID, err, `lotname: ${lotname}, spottrsite: ${spottrsite}, perimeter: ${perimeter}`)
+    db.run(UPDATE_PARKINGLOT, [lotname, spottrsite, perimeter, id], (err) => {
         exports.select_ParkingLot(id, (err, row) => {
             callback(err, row)
         })
@@ -390,7 +415,9 @@ exports.update_ParkingLot = (id, lotname, spottrsite, perimeter, callback) => {
 
 exports.update_MasterNode = (id, name, parkinglot, location, numsensors, hostname, callback) => {
     db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
+        insert_DbLog("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
         db.run(UPDATE_MASTERNODE, [hostname, id], function (err) {
+            insert_DbLog("UPDATE", "MasterNode", this.lastID, err, `hostname: ${hostname}`)
             exports.select_MasterNode(id, (err, row) => {
                 callback(err, row)
             })
@@ -400,7 +427,9 @@ exports.update_MasterNode = (id, name, parkinglot, location, numsensors, hostnam
 
 exports.update_SlaveNode = (id, name, parkinglot, location, numsensors, masternode, callback) => {
     db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
+        insert_DbLog("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
         db.run(UPDATE_SLAVENODE, [masternode, id], function (err) {
+            insert_DbLog("UPDATE", "SlaveNode", this.lastID, err, `masternode: ${masternode}`)
             exports.select_SlaveNode(id, (err, row) => {
                 callback(err, row)
             })
@@ -410,6 +439,7 @@ exports.update_SlaveNode = (id, name, parkinglot, location, numsensors, masterno
 
 exports.update_ParkingSpot = (id, name, spottrnode, sensornum, occupied, longitude, latitude, callback) => {
     db.run(UPDATE_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude, id], function (err) {
+        insert_DbLog("UPDATE", "ParkingSpot", this.lastID, err, `spotname: ${name}, spottrnode: ${spottrnode}, sensornum: ${sensornum}, occupied: ${occupied}, longitude: ${longitude}, latitude: ${latitude}`)
         exports.select_ParkingSpot(id, (err, row) => {
             callback(err, row)
         })
