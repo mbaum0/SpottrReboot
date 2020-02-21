@@ -15,9 +15,10 @@ app.listen(HTTP_PORT, () => {
 app.get("/", (req, res, next) => {
     res.json({"message": "Shit Works!"})
     database.insert_SpottrSite("RIT", "1 Lomb Memorial Drive")
-    database.insert_SpottrNode("MASTERNODE", 0, "CARLSON", 3)
-    database.insert_SpottrNode("SLAVE0", 0, "CARLSON", 3)
-    database.insert_SpottrNode("SLAVE1", 0, "CARLSON", 3)
+    database.insert_ParkingLot(1, "CARLSON", "[]")
+    database.insert_SpottrNode("MASTERNODE", 1, "TOP LEFT", 3)
+    database.insert_SpottrNode("SLAVE0", 1, "TOP CENTER", 3)
+    database.insert_SpottrNode("SLAVE1", 1, "TOP RIGHT", 3)
     
     database.insert_MasterNode(1, "masternode.com")
     
@@ -35,61 +36,141 @@ app.get("/", (req, res, next) => {
     database.insert_ParkingSpot("c2", 3, 2, 0, 76.01, 81.01)
 });
 
-app.get("/api/spottrsites", (req, res, next) => {
+// ================== SELECT ALL ENDPOINTS =================== //
+app.get("/api/spottrsite", (req, res, next) => {
     database.selectall_SpottrSite((err, rows) => {
         if (err)
         {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({SpottrSites: rows})
+        res.json({SpottrSite: rows})
     })
 })
 
-app.get("/api/spottrnodes", (req, res, next) => {
+app.get("/api/parkinglot", (req, res, next) => {
+    database.selectall_ParkingLot((err, rows) => {
+        if (err)
+        {
+            res.status(400).json({"error":err.message})
+            return
+        }
+        res.json({ParkingLot: rows})
+    })
+})
+
+app.get("/api/spottrnode", (req, res, next) => {
     database.selectall_SpottrNode((err, rows) => {
         if (err)
         {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({SpottrNodes: rows})
+        res.json({SpottrNode: rows})
     })
 })
 
-app.get("/api/masternodes", (req, res, next) => {
+app.get("/api/masternode", (req, res, next) => {
     database.selectall_MasterNode((err, rows) => {
         if (err)
         {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({MasterNodes: rows})
+        res.json({MasterNode: rows})
     })
 })
 
-app.get("/api/slavenodes", (req, res, next) => {
+app.get("/api/slavenode", (req, res, next) => {
     database.selectall_SlaveNode((err, rows) => {
         if (err)
         {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({SlaveNodes: rows})
+        res.json({SlaveNode: rows})
     })
 })
 
-app.get("/api/parkingspots", (req, res, next) => {
+app.get("/api/parkingspot", (req, res, next) => {
     database.selectall_ParkingSpot((err, rows) => {
         if (err)
         {
             res.status(400).json({"error":err.message})
             return
         }
-        res.json({ParkingSpots: rows})
+        res.json({ParkingSpot: rows})
     })
 })
 
+// ================== SELECT ONE ENDPOINTS =================== //
+app.get("/api/spottrsite/:id", (req, res, next) => {
+    database.select_SpottrSite(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({SpottrSite: row})
+    })
+})
+
+app.get("/api/parkinglot/:id", (req, res, next) => {
+    database.select_ParkingLot(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({ParkingLot: row})
+    })
+})
+
+app.get("/api/spottrnode/:id", (req, res, next) => {
+    database.select_SpottrNode(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({SpottrNode: row})
+    })
+})
+
+app.get("/api/masternode/:id", (req, res, next) => {
+    database.select_MasterNode(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({MasterNode: row})
+    })
+})
+
+app.get("/api/slavenode/:id", (req, res, next) => {
+    database.select_SlaveNode(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({SlaveNode: row})
+    })
+})
+
+app.get("/api/parkingspot/:id", (req, res, next) => {
+    database.select_ParkingSpot(req.params.id, (err, row) => {
+        if (err)
+        {
+            res.status(400).json({"error": err.message})
+            return
+        }
+        res.json({ParkingSpot: row})
+    })
+})
+
+// ================ SELECT FILTER ENDPOINTS ================== //
 
 // Default response for any other request
 app.use((req, res) => {
