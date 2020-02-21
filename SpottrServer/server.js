@@ -346,6 +346,57 @@ app.delete("/api/parkingspots/:id", (req, res, next) => {
     })
 })
 
+// ==================== UPDATE ENDPOINTS ===================== //
+app.patch("/api/spottrsites/:id", (req, res, next) => {
+    database.update_SpottrSite(req.params.id, req.body.sitename, req.body.address, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
+app.patch("/api/parkinglots/:id", (req, res, next) => {
+    database.update_ParkingLot(req.params.id, req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
+app.patch("/api/maternodes/:id", (req, res, next) => {
+    database.update_MasterNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.hostname, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
+app.patch("/api/slavenodes/:id", (req, res, next) => {
+    database.update_SlaveNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.masternode, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
+app.patch("/api/parkingspots/:id", (req, res, next) => {
+    database.update_SlaveNode(req.params.id, req.body.name, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
 // Default error message
 app.get("/api/error", (req, res, next) => {
     res.status(400).json({ "error": "sample error message" })

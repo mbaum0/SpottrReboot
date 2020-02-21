@@ -47,6 +47,13 @@ const INSERT_MASTERNODE = `INSERT INTO MasterNode (id, hostname) VALUES (?, ?);`
 const INSERT_SLAVENODE = `INSERT INTO SlaveNode (id, masternode) VALUES (?, ?);`
 const INSERT_PARKINGSPOT = `INSERT INTO ParkingSpot (spotname, spottrnode, sensornum, occupied, longitude, latitude) VALUES (?, ?, ?, ?, ?, ?);`
 
+const UPDATE_SPOTTRSITE = `UPDATE SpottrSite SET sitename = COALESCE(?, sitename), address=COALESCE(?, address) WHERE id=?;`
+const UPDATE_PARKINGLOT = `UPDATE ParkingLot SET lotname=COALESCE(?,lotname), spottrsite=COALESCE(?, spottrsite), perimeter=COALESCE(?, perimeter) WHERE id=?;`
+const UPDATE_SPOTTRNODE = `UPDATE SpottrNode SET nodename=COALESCE(?, nodename), parkinglot=COALESCE(?, parkinglot), location=COALESCE(?, location), numsensors=COALESCE(?, numsensors) WHERE id=?;`
+const UPDATE_MASTERNODE = `UPDATE MasterNode SET hostname=COALESCE(?, hostname), WHERE id=?;`
+const UPDATE_SLAVENODE = `UPDATE SlaveNode SET masternode=COALESCE(?, masternode), WHERE id=?;`
+const UPDATE_PARKINGSPOT = `UPDATE ParkingSpot SET spotname=COALESCE(?, spotname), spottrnode=COALESCE(?, spottrnode), sensornum=COALESCE(?, sensornum), occupied=COALESCE(?, occupied), longitude=COALESCE(?, longitude), latitude=COALESCE(?, latitude) WHERE id=?;`
+
 const SELECT_ALL_SPOTTRSITE = `SELECT * FROM SpottrSite;`
 const SELECT_ALL_PARKINGLOT = `SELECT * FROM ParkingLot;`
 const SELECT_ALL_SPOTTRNODE = `SELECT * FROM SpottrNode;`
@@ -334,5 +341,52 @@ exports.delete_SpottrNode = (id, callback) => {
 exports.delete_ParkingSpot = (id, callback) => {
     db.run(DELETE_PARKINGSPOT, [id], function (err) {
         callback(err, this.changes)
+    })
+}
+
+// ===================== UPDATE FUNCTIONS ===================== //
+exports.update_SpottrSite = (id, sitename, address, callback) => {
+    db.run("BEGIN")
+    db.run(UPDATE_SPOTTRSITE, [sitename, address, id], () => {
+        db.run("commit")
+        exports.select_SpottrSite(id, (err, row) => {
+            callback(err, row)
+        })
+    })
+}
+
+exports.update_ParkingLot = (id, lotname, spottrsite, perimeter, callback) => {
+    db.run(UPDATE_PARKINGLOT, [lotname, spottrsite, perimeter, id], function (err) {
+        exports.select_ParkingLot(id, (err, row) => {
+            callback(err, row)
+        })
+    })
+}
+
+exports.update_MasterNode = (id, name, parkinglot, location, numsensors, hostname, callback) => {
+    db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
+        db.run(UPDATE_MASTERNODE, [hostname, id], function (err) {
+            exports.select_MasterNode(id, (err, row) => {
+                callback(err, row)
+            })
+        })
+    })
+}
+
+exports.update_SlaveNode = (id, name, parkinglot, location, numsensors, masternode, callback) => {
+    db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
+        db.run(UPDATE_SLAVENODE, [masternode, id], function (err) {
+            exports.select_SlaveNode(id, (err, row) => {
+                callback(err, row)
+            })
+        })
+    })
+}
+
+exports.update_ParkingSpot = (id, name, spottrnode, sensornum, occupied, longitude, latitude, callback) => {
+    db.run(UPDATE_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude, id], function (err) {
+        exports.select_ParkingSpot(id, (err, row) => {
+            callback(err, row)
+        })
     })
 }
