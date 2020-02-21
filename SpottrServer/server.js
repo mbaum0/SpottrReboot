@@ -19,21 +19,16 @@ app.get("/", (req, res, next) => {
     database.insert_ParkingLot("CARLSON LOWER", 1, "[]")
     database.insert_ParkingLot("CARLSON UPPER", 1, "[]")
 
-    database.insert_SpottrNode("MASTERNODE", 1, "TOP LEFT", 3)
-    database.insert_SpottrNode("SLAVE0", 1, "TOP CENTER", 3)
-    database.insert_SpottrNode("SLAVE1", 1, "TOP RIGHT", 3)
+    database.insert_MasterNodeComplete("MASTER0", 1, "ANYWHERE", 3, "domain1.com")
+    database.insert_MasterNodeComplete("MASTER1", 2, "ANYWHERE", 3, "domain2.com")
 
-    database.insert_SpottrNode("MASTERNODE", 2, "TOP LEFT", 3)
-    database.insert_SpottrNode("SLAVE0", 2, "TOP CENTER", 3)
-    database.insert_SpottrNode("SLAVE1", 2, "TOP RIGHT", 3)
-    
-    database.insert_MasterNode(1, "masternode1.com")
-    database.insert_MasterNode(4, "masternode2.com")
-    
-    database.insert_SlaveNode(2, 1)
-    database.insert_SlaveNode(3, 1)
-    database.insert_SlaveNode(5, 2)
-    database.insert_SlaveNode(6, 2)
+    database.insert_SlaveNodeComplete("SLAVE1", 1, "TOP LEFT", 3, 1)
+    database.insert_SlaveNodeComplete("SLAVE2", 1, "TOP CENTER", 3, 1)
+    database.insert_SlaveNodeComplete("SLAVE3", 1, "TOP RIGHT", 3, 1)
+
+    database.insert_SlaveNodeComplete("SLAVE4", 2, "TOP LEFT", 3, 2)
+    database.insert_SlaveNodeComplete("SLAVE5", 2, "TOP CENTER", 3, 2)
+    database.insert_SlaveNodeComplete("SLAVE6", 2, "TOP RIGHT", 3, 2)
     
     database.insert_ParkingSpot("a0", 1, 0, 0, 76.01, 81.01)
     database.insert_ParkingSpot("a1", 1, 1, 0, 76.01, 81.01)

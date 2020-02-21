@@ -148,6 +148,18 @@ exports.insert_SlaveNode = (id, masternode) => {
     db.run(INSERT_SLAVENODE, [id, masternode])
 }
 
+exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hostname) => {
+    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+        db.run(INSERT_MASTERNODE, [this.lastID, hostname])
+    })
+}
+
+exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, masternode) => {
+    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+        db.run(INSERT_SLAVENODE, [this.lastID, masternode])
+    })
+}
+
 exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, latitude) => {
     db.run(INSERT_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude])
 }
