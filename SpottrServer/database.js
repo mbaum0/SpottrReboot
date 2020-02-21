@@ -52,14 +52,20 @@ const SELECT_ALL_PARKINGLOT = `SELECT * FROM ParkingLot;`
 const SELECT_ALL_SPOTTRNODE = `SELECT * FROM SpottrNode;`
 const SELECT_ALL_MASTERNODE = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id;`
 const SELECT_ALL_SLAVENODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id;`
-const SELECT_ALL_PARKINGSPOT = `SELECT * FROM ParkingSpot;`
+const SELECT_ALL_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id;`
 
 const SELECT_SPOTTRSITE = `SELECT * FROM SpottrSite WHERE id=?;`
 const SELECT_PARKINGLOT = `SELECT * FROM ParkingLot WHERE id=?;`
 const SELECT_SPOTTRNODE = `SELECT * FROM SpottrNode WHERE id=?;`
 const SELECT_MASTERNODE = `SELECT * FROM MasterNode WHERE id=? INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id;`
 const SELECT_SLAVENODE = `SELECT * FROM SlaveNode WHERE id=? INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id;`
-const SELECT_PARKINGSPOT = `SELECT * FROM ParkingSpot WHERE id=?;`
+const SELECT_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND p.id=?;`
+
+const SELECT_PARKINGLOT_WITH_SPOTTRSITE = `SELECT * FROM ParkingLot WHERE spottrsite=?;`
+const SELECT_SPOTTRNODE_WITH_PARKINGLOT = `SELECT * FROM SpottrNode WHERE parkinglot=?;`
+const SELECT_MASTERNODE_WITH_PARKINGLOT = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id WHERE parkinglot=?;`
+const SELECT_SLAVENODE_WITH_PARKINGLOT = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE parkinglot=?;`
+const SELECT_PARKINGSPOT_WITH_PARKINGLOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND n.parkinglot=?;`
 
 
 // Create database
@@ -127,7 +133,7 @@ exports.insert_SpottrSite = (name, address) => {
 }
 
 exports.insert_ParkingLot = (lotname, spottrsite, perimeter) => {
-    db.run(INSERT_PARKINGLOT, [spottrsite, lotname, perimeter])
+    db.run(INSERT_PARKINGLOT, [lotname, spottrsite, perimeter])
 }
 
 exports.insert_SpottrNode = (name, parkinglot, location, numsensors) => {
@@ -223,3 +229,33 @@ exports.select_ParkingSpot = (id, callback) => {
 }
 
 // ================ SELECT FILTER ENDPOINTS ================== //
+
+exports.select_ParkingLotWithSpottrSite = (spottrsite, callback) => {
+    db.all(SELECT_PARKINGLOT_WITH_SPOTTRSITE, [spottrsite], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_SpottrNodeWithParkingLot = (parkinglot, callback) => {
+    db.all(SELECT_SPOTTRNODE_WITH_PARKINGLOT, [parkinglot], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_MasterNodeWithParkingLot = (parkinglot, callback) => {
+    db.all(SELECT_MASTERNODE_WITH_PARKINGLOT, [parkinglot], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_SlaveNodeWithParkingLot = (parkinglot, callback) => {
+    db.all(SELECT_SLAVENODE_WITH_PARKINGLOT, [parkinglot], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_ParkingSpotWithParkingLot = (parkinglot, callback) => {
+    db.all(SELECT_PARKINGSPOT_WITH_PARKINGLOT, [parkinglot], (err, row) => {
+        callback(err, row)
+    })
+}
