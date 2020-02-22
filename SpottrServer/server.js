@@ -1,8 +1,10 @@
 var express = require("express")
 const bodyparser = require("body-parser")
+const cors = require("cors")
 
 var app = express()
 app.use(bodyparser.json())
+app.use(cors())
 
 var database = require("./database.js")
 

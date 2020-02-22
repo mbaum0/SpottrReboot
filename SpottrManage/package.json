@@ -1,0 +1,11 @@
+{
+  "name": "SpottrManage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "vue": "^2.6.11",
+    "vuex": "^3.1.2"
+  }
+}
