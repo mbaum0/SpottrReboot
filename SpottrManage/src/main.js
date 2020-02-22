@@ -4,6 +4,7 @@ import App from './App.vue'
 import store from './store'
 import vuetify from './plugins/vuetify';
 import VueSocketIO from 'vue-socket.io'
+import router from './router'
 
 Vue.config.productionTip = false
 
@@ -20,5 +21,6 @@ Vue.use(new VueSocketIO({
 new Vue({
   store,
   vuetify,
+  router,
   render: function (h) { return h(App) }
 }).$mount('#app')

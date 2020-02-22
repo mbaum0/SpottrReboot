@@ -19,7 +19,8 @@ export default new Vuex.Store({
     masterNodes: [],
     slaveNodes: [],
     parkingSpots: [],
-    dbLogs: []
+    dbLogs: [],
+    navigationPage: "dashboard",
   },
   mutations: {
     SOCKET_DBLOG(state, data)
@@ -43,6 +44,9 @@ export default new Vuex.Store({
     },
     SET_DBLOGS(state, dbLogs) {
       state.dbLogs = dbLogs
+    },
+    SET_NAVIGATIONPAGE(state, page) {
+      state.navigationPage = page
     }
   },
   actions: {
@@ -63,6 +67,10 @@ export default new Vuex.Store({
     },
     async fetchAllDbLogs({ commit }) {
       commit('SET_DBLOGS', (await dbLogRepo.fetchAll()).data.DbLogs)
+    },
+    
+    setNavigationPage({ commit }, page) {
+      commit('SET_NAGIVATIONPAGE', page)
     }
   },
   getters: {

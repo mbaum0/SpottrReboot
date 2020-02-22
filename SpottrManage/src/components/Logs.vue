@@ -1,31 +1,4 @@
 <template>
-  <v-app id="inspire">
-
-    <v-app-bar clipped-left app color="indigo" dark>
-      <v-toolbar-title>Application</v-toolbar-title>
-    </v-app-bar>
-
-    <v-navigation-drawer fixed app clipped>
-      <v-list dense>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>mdi-card-text</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Logs</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
     <v-content>
       <v-container class="fill-height" fluid>
         <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="dbLogs" class="elevation-1">
@@ -39,17 +12,13 @@
         </v-data-table>
       </v-container>
     </v-content>
-    <v-footer color="indigo" app>
-      <span class="white--text">&copy; 2019</span>
-    </v-footer>
-  </v-app>
 </template>
 
 <script>
 import { mapState, mapGetters } from "vuex";
 
 export default {
-  name: "Dashboard",
+  name: "Logs",
   props: {
     msg: String
   },
@@ -77,7 +46,6 @@ export default {
     }
   },
   data: () => ({
-    drawer: null,
     dbLogHeaders: [
       { text: "Timestamp", value: "timestamp"},
       { text: "Event", value: "event", sortable: false},
