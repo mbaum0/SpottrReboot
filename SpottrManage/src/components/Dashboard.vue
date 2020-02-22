@@ -1,9 +1,11 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-    >
+
+    <v-app-bar clipped-left app color="indigo" dark>
+      <v-toolbar-title>Application</v-toolbar-title>
+    </v-app-bar>
+
+    <v-navigation-drawer fixed app clipped>
       <v-list dense>
         <v-list-item link>
           <v-list-item-action>
@@ -15,78 +17,36 @@
         </v-list-item>
         <v-list-item link>
           <v-list-item-action>
-            <v-icon>mdi-contact-mail</v-icon>
+            <v-icon>mdi-card-text</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Contact</v-list-item-title>
+            <v-list-item-title>Logs</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar
-      app
-      color="indigo"
-      dark
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>Application</v-toolbar-title>
-    </v-app-bar>
-
     <v-content>
-      <v-container
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          align="center"
-          justify="center"
-        >
-          <v-col class="text-center">
-            <v-tooltip left>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  :href="source"
-                  icon
-                  large
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-code-tags</v-icon>
-                </v-btn>
-              </template>
-              <span>Source</span>
-            </v-tooltip>
-
-            <v-tooltip right>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  large
-                  href="https://codepen.io/johnjleider/pen/zgxeLQ"
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-codepen</v-icon>
-                </v-btn>
-              </template>
-              <span>Codepen</span>
-            </v-tooltip>
-          </v-col>
-        </v-row>
+      <v-container class="fill-height" fluid>
+        <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="dbLogs" class="elevation-1">
+          <template v-slot:item.note="{ item }">
+            <v-chip v-if="item.error" :color="getErrColor(item.error)" dark>ERR: {{ item.note }}</v-chip>
+            <v-chip v-else-if="item.note">{{ item.note }}</v-chip>
+          </template>
+          <template v-slot:item.event="{ item }">
+            <v-chip :color="getMethodColor(item.event)" dark> {{ item.event }}</v-chip>
+          </template>
+        </v-data-table>
       </v-container>
     </v-content>
-    <v-footer
-      color="indigo"
-      app
-    >
+    <v-footer color="indigo" app>
       <span class="white--text">&copy; 2019</span>
     </v-footer>
   </v-app>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "Dashboard",
@@ -94,19 +54,37 @@ export default {
     msg: String
   },
   computed: {
-      ...mapState(['spottrSites']),
-      ...mapGetters(['spottrSites'])
+    ...mapState(["spottrSites", "dbLogs"]),
+    ...mapGetters(["spottrSites"])
   },
   mounted() {
-      this.$store.dispatch('fetchAllSpottrSites')
-      this.$store.dispatch('fetchAllParkingLots')
-      this.$store.dispatch('fetchAllMasterNodes')
-      this.$store.dispatch('fetchAllSlaveNodes')
-      this.$store.dispatch('fetchAllParkingSpots')
-      this.$store.dispatch('fetchAllDbLogs')
+    this.$store.dispatch("fetchAllSpottrSites");
+    this.$store.dispatch("fetchAllParkingLots");
+    this.$store.dispatch("fetchAllMasterNodes");
+    this.$store.dispatch("fetchAllSlaveNodes");
+    this.$store.dispatch("fetchAllParkingSpots");
+    this.$store.dispatch("fetchAllDbLogs");
+  },
+  methods: {
+    getErrColor (err) {
+      if (err) {return 'red'} else {return 'green'}
+    },
+    getMethodColor (method) {
+      if (method == "UPDATE") {return 'blue'}
+      else if (method == "DELETE") {return 'red'}
+      else if (method == "INSERT") {return 'green'}
+      else {return ''}
+    }
   },
   data: () => ({
     drawer: null,
+    dbLogHeaders: [
+      { text: "Timestamp", value: "timestamp"},
+      { text: "Event", value: "event", sortable: false},
+      { text: "Resource #", value: "res_num", sortable: false},
+      { text: "Resource type", value: "type", sortable: false},
+      { text: "Note", value: "note", sortable: false}
+    ]
   })
 };
 </script>

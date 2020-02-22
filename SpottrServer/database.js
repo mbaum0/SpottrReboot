@@ -375,27 +375,43 @@ exports.select_SlaveNodeWithMasterNode = (masternode, callback) => {
 // ===================== DELETE FUNCTIONS ===================== //
 exports.delete_SpottrSite = (id, callback) => {
     db.run(DELETE_SPOTTRSITE, [id], function (err) {
-        insert_DbLog("DELETE", "SpottrSite", this.lastID, err, null)
+        if (this.changes == 0) {
+            insert_DbLog("DELETE", "SpottrSite", id, 1, "Resouce does not exist")
+        } else {
+            insert_DbLog("DELETE", "SpottrSite", id, 0, null)
+        }
         callback(err, this.changes)
     })
 }
 
 exports.delete_ParkingLot = (id, callback) => {
     db.run(DELETE_PARKINGLOT, [id], function (err) {
-        insert_DbLog("DELETE", "ParkingLot", this.lastID, err, null)
+        if (this.changes == 0) {
+            insert_DbLog("DELETE", "ParkingLot", id, 1, "Resource does not exist")
+        } else {
+            insert_DbLog("DELETE", "ParkingLot", id, err, null)
+        }
         callback(err, this.changes)
     })
 }
 
 exports.delete_SpottrNode = (id, callback) => {
     db.run(DELETE_SPOTTRNODE, [id], function (err) {
-        insert_DbLog("DELETE", "SpottrNode", this.lastID, err, null)
+        if (this.changes == 0) {
+            insert_DbLog("DELETE", "SpottrNode", id, 1, "Resource does not exist")
+        } else {
+            insert_DbLog("DELETE", "SpottrNode", id, err, null)
+        }
         callback(err, this.changes)
     })
 }
 exports.delete_ParkingSpot = (id, callback) => {
     db.run(DELETE_PARKINGSPOT, [id], function (err) {
-        insert_DbLog("DELETE", "ParkingSpot", this.lastID, err, null)
+        if (this.changes == 0) {
+            insert_DbLog("DELETE", "ParkingSpot", id, 1, "Resource does not exist")
+        } else {
+            insert_DbLog("DELETE", "ParkingSpot", id, err, null)
+        }
         callback(err, this.changes)
     })
 }
