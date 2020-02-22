@@ -7,7 +7,8 @@ const spottrSiteRepo = repositoryFactory.get('spottrSite');
 const parkingLotRepo = repositoryFactory.get('parkingLot');
 const masterNodeRepo = repositoryFactory.get('masterNode');
 const slaveNodeRepo = repositoryFactory.get('slaveNode');
-const parkingSpotRepo = repositoryFactory.get('parkingSpot')
+const parkingSpotRepo = repositoryFactory.get('parkingSpot');
+const dbLogRepo = repositoryFactory.get('dbLog');
 
 Vue.use(Vuex);
 
@@ -17,9 +18,14 @@ export default new Vuex.Store({
     parkingLots: [],
     masterNodes: [],
     slaveNodes: [],
-    parkingSpots: []
+    parkingSpots: [],
+    dbLogs: []
   },
   mutations: {
+    SOCKET_DBLOG(state, data)
+    {
+      state.dbLogs.push(data)
+    },
     SET_SPOTTRSITES(state, spottrSites) {
       state.spottrSites = spottrSites
     },
@@ -34,6 +40,9 @@ export default new Vuex.Store({
     },
     SET_PARKINGSPOTS(state, parkingSpots) {
       state.parkingSpots = parkingSpots
+    },
+    SET_DBLOGS(state, dbLogs) {
+      state.dbLogs = dbLogs
     }
   },
   actions: {
@@ -51,6 +60,9 @@ export default new Vuex.Store({
     },
     async fetchAllParkingSpots({ commit }) {
       commit('SET_PARKINGSPOTS', (await parkingSpotRepo.fetchAll()).data.ParkingSpots)
+    },
+    async fetchAllDbLogs({ commit }) {
+      commit('SET_DBLOGS', (await dbLogRepo.fetchAll()).data.DbLogs)
     }
   },
   getters: {

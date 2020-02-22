@@ -1,4 +1,5 @@
 var sqlite3 = require('sqlite3').verbose()
+var websock = require("./websock.js")
 
 const DBPATH = "db.sqlite"
 
@@ -77,6 +78,8 @@ const SELECT_SPOTTRNODE = `SELECT * FROM SpottrNode WHERE id=?;`
 const SELECT_MASTERNODE = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id WHERE MasterNode.id=?;`
 const SELECT_SLAVENODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode ON SpottrNode.id = SlaveNode.id WHERE SlaveNode.id=?;`
 const SELECT_PARKINGSPOT = `SELECT p.id, p.spotname, p.spottrnode, p.sensornum, p.occupied, p.longitude, p.latitude, n.parkinglot FROM ParkingSpot p, SpottrNode n WHERE p.spottrnode = n.id AND p.id=?;`
+
+const SELECT_DBLOG = `SELECT * FROM DbLog WHERE id=?;`
 
 const SELECT_PARKINGLOT_WITH_SPOTTRSITE = `SELECT * FROM ParkingLot WHERE spottrsite=?;`
 const SELECT_SPOTTRNODE_WITH_PARKINGLOT = `SELECT * FROM SpottrNode WHERE parkinglot=?;`
@@ -159,7 +162,7 @@ exports.createTables = () => {
 // ===================== INSERT FUNCTIONS ===================== //
 exports.insert_SpottrSite = (name, address, callback) => {
     db.run(INSERT_SPOTTRSITE, [name, address], function (err) {
-        insert_DbLog("INSERT", "SpottrSite", this.lastID, err, null)
+        insert_DbLog("INSERT", "SpottrSite", this.lastID, err, `sitename: ${name}, address: ${address}`)
         exports.select_SpottrSite(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -168,7 +171,7 @@ exports.insert_SpottrSite = (name, address, callback) => {
 
 exports.insert_ParkingLot = (lotname, spottrsite, perimeter, callback) => {
     db.run(INSERT_PARKINGLOT, [lotname, spottrsite, perimeter], function (err) {
-        insert_DbLog("INSERT", "ParkingLot", this.lastID, err, null)
+        insert_DbLog("INSERT", "ParkingLot", this.lastID, err, `lotname: ${lotname}, spottrsite: ${spottrsite}, perimeter: ${perimeter}`)
         exports.select_ParkingLot(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -204,9 +207,9 @@ exports.insert_SlaveNode = (id, masternode, callback) => {
 
 exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hostname, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
-        insert_DbLog("INSERT", "SpottrNode", this.lastID, err, null)
+        insert_DbLog("INSERT", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
         db.run(INSERT_MASTERNODE, [this.lastID, hostname], function (err) {
-            insert_DbLog("INSERT", "MasterNode", this.lastID, err, null)
+            insert_DbLog("INSERT", "MasterNode", this.lastID, err, `hostname: ${hostname}`)
             exports.select_MasterNode(this.lastID, (err, row) => {
                 callback(err, row)
             })
@@ -216,9 +219,9 @@ exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hos
 
 exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, masternode, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
-        insert_DbLog("INSERT", "SpottNode", this.lastID, err, null)
+        insert_DbLog("INSERT", "SpottNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
         db.run(INSERT_SLAVENODE, [this.lastID, masternode], function (err) {
-            insert_DbLog("INSERT", "SlaveNode", this.lastID, err, null)
+            insert_DbLog("INSERT", "SlaveNode", this.lastID, err, `masternode: ${masternode}`)
             exports.select_SlaveNode(this.lastID, (err, row) => {
                 callback(err, row)
             })
@@ -228,7 +231,7 @@ exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, mast
 
 exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, latitude, callback) => {
     db.run(INSERT_PARKINGSPOT, [name, spottrnode, sensornum, occupied, longitude, latitude], function (err) {
-        insert_DbLog("INSERT", "ParkingSpot", this.lastID, err, null)
+        insert_DbLog("INSERT", "ParkingSpot", this.lastID, err, `spotname: ${name}, spottrnode: ${spottrnode}, sensornum: ${sensornum}, occupied: ${occupied}, longitude: ${longitude}, latitude: ${latitude}`)
         exports.select_ParkingSpot(this.lastID, (err, row) => {
             callback(err, row)
         })
@@ -237,7 +240,11 @@ exports.insert_ParkingSpot = (name, spottrnode, sensornum, occupied, longitude, 
 
 // non-export because db log can only be created here
 function insert_DbLog(event, type, res_num, error, note) {
-    db.run(INSERT_DBLOG, [event, type, res_num, error, note])
+    db.run(INSERT_DBLOG, [event, type, res_num, error, note], function (err) {
+        exports.select_DbLog(this.lastID, (err, row) => {
+            websock.broadcastSockMsg('DBLOG', row)
+        })
+    })
 }
 
 // ================== SELECT ALL FUNCTIONS =================== //
@@ -317,6 +324,12 @@ exports.select_SlaveNode = (id, callback) => {
 
 exports.select_ParkingSpot = (id, callback) => {
     db.get(SELECT_PARKINGSPOT, [id], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_DbLog = (id, callback) => {
+    db.get(SELECT_DBLOG, [id], (err, row) => {
         callback(err, row)
     })
 }

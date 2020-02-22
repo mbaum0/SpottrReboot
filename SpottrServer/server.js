@@ -1,14 +1,17 @@
-var express = require("express")
+const express = require("express")
 const bodyparser = require("body-parser")
 const cors = require("cors")
 
+var websock = require("./websock.js")
+var database = require("./database.js")
 var app = express()
+
+exports.app = app;
+
 app.use(bodyparser.json())
 app.use(cors())
 
-var database = require("./database.js")
-
-var HTTP_PORT = 8000
+const HTTP_PORT = 8000
 
 database.createTables(() => { });
 
@@ -114,6 +117,16 @@ app.get("/api/parkingspots", (req, res, next) => {
             return
         }
         res.json({ ParkingSpots: rows })
+    })
+})
+
+app.get("/api/dblogs", (req, res, next) => {
+    database.selectall_DbLog((err, rows) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
+            return
+        }
+        res.json({ DbLogs: rows})
     })
 })
 
@@ -338,6 +351,20 @@ app.delete("/api/parkingspots/:id", (req, res, next) => {
     database.delete_ParkingSpot(req.params.id, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
+    })
+})
+
+app.delete("/api/dblogs", (req, res, next) => {
+    database.delete_DbLog((err, changes) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
         }
         else if (changes == 0) {
             res.status(404).json()

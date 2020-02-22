@@ -22,6 +22,7 @@ export default {
       this.$store.dispatch('fetchAllMasterNodes')
       this.$store.dispatch('fetchAllSlaveNodes')
       this.$store.dispatch('fetchAllParkingSpots')
+      this.$store.dispatch('fetchAllDbLogs')
   }
 };
 </script>
