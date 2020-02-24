@@ -5,6 +5,7 @@ const parkingLotDb = require('./parkingLotDb')
 const spottrNodeDb = require('./spottrNodeDb')
 const parkingSpotDb = require('./parkingSpotDb')
 const dbLogDb = require('./dbLogDb')
+const preferenceDb = require('./preferenceDb')
 
 const DBPATH = "db.sqlite"
 
@@ -23,6 +24,7 @@ exports.parkingLotDb = parkingLotDb;
 exports.spottrNodeDb = spottrNodeDb;
 exports.parkingSpotDb = parkingSpotDb;
 exports.dbLogDb = dbLogDb;
+exports.preferenceDb = preferenceDb;
 
 // Create all database tables if they don't already exist
 exports.createTables = () => {
@@ -31,4 +33,5 @@ exports.createTables = () => {
     spottrNodeDb.init(db);
     parkingSpotDb.init(db);
     dbLogDb.init(db);
+    preferenceDb.init(db);
 }

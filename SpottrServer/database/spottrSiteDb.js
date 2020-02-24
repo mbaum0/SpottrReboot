@@ -47,7 +47,7 @@ exports.select = (id, callback) => {
 exports.delete = (id, callback) => {
     db.run(DELETE_SPOTTRSITE, [id], function (err) {
         if (this.changes == 0) {
-            dbLogDb.insert("DELETE", "SpottrSite", id, 1, "Resouce does not exist")
+            dbLogDb.insert("DELETE", "SpottrSite", id, 1, "Resource does not exist")
         } else {
             dbLogDb.insert("DELETE", "SpottrSite", id, 0, null)
         }
