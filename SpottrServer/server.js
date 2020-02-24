@@ -23,6 +23,9 @@ app.listen(HTTP_PORT, () => {
 app.get("/", (req, res, next) => {
     res.json({ "message": "Shit Works!" })
     database.spottrSiteDb.insert("RIT", "1 Lomb Memorial Drive", ()=>{})
+    database.spottrSiteDb.insert("Wegmans", "100 Jefferson Road", ()=>{})
+    database.spottrSiteDb.insert("Walmart", "110 Jefferson Road", ()=>{})
+    database.spottrSiteDb.insert("Dave and Busters", "97 Jefferson Road", ()=>{})
 
     database.parkingLotDb.insert("CARLSON LOWER", 1, "[]", ()=>{})
     database.parkingLotDb.insert("CARLSON UPPER", 1, "[]", ()=>{})
@@ -57,6 +60,8 @@ app.get("/", (req, res, next) => {
     database.parkingSpotDb.insert("f0", 6, 0, 0, 76.01, 81.01, ()=>{})
     database.parkingSpotDb.insert("f1", 6, 1, 0, 76.01, 81.01, ()=>{})
     database.parkingSpotDb.insert("f2", 6, 2, 0, 76.01, 81.01, ()=>{})
+
+    database.preferenceDb.insert("defaultSpottrSite", null, ()=>{})
 });
 
 // ================== SELECT ALL ENDPOINTS =================== //
@@ -130,6 +135,20 @@ app.get("/api/dblogs", (req, res, next) => {
     })
 })
 
+app.get("/api/preferences", (req, res, next) => {
+    database.preferenceDb.selectall((err, rows) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
+            return
+        }
+        var resDict = {}
+        for (let i = 0; i < rows.length; i++) {
+            resDict[rows[i].key] = rows[i].val
+        }
+        res.json({ Preferences: resDict})
+    })
+})
+
 // ================== SELECT ONE ENDPOINTS =================== //
 app.get("/api/spottrsites/:id", (req, res, next) => {
     database.spottrSiteDb.select(req.params.id, (err, row) => {
@@ -188,6 +207,18 @@ app.get("/api/parkingspots/:id", (req, res, next) => {
             return
         }
         res.json({ ParkingSpot: row })
+    })
+})
+
+app.get("/api/preferences/:key", (req, res, next) => {
+    database.preferenceDb.select(req.params.key, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        let resDict = {}
+        resDict[row.key] = row.val
+        res.json({ Preference:  resDict });
     })
 })
 
@@ -304,6 +335,16 @@ app.post("/api/parkingspots", (req, res, next) => {
     })
 })
 
+app.post("/api/preferences", (req, res, next) => {
+    database.preferenceDb.insert(req.body.key, req.body.val, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
 // ==================== DELETE ENDPOINTS ===================== //
 app.delete("/api/spottrsites/:id", (req, res, next) => {
     database.spottrSiteDb.delete(req.params.id, (err, changes) => {
@@ -375,6 +416,20 @@ app.delete("/api/dblogs", (req, res, next) => {
     })
 })
 
+app.delete("/api/preferences/:key", (req, res, next) => {
+    database.preferenceDb.delete(req.params.key, (err, changes) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
+    })
+})
+
 // ==================== UPDATE ENDPOINTS ===================== //
 app.patch("/api/spottrsites/:id", (req, res, next) => {
     database.spottrSiteDb.update(req.params.id, req.body.sitename, req.body.address, (err, row) => {
@@ -418,6 +473,16 @@ app.patch("/api/slavenodes/:id", (req, res, next) => {
 
 app.patch("/api/parkingspots/:id", (req, res, next) => {
     database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.name, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+            return
+        }
+        res.json(row)
+    })
+})
+
+app.patch("/api/preferences/:key", (req, res, next) => {
+    database.preferenceDb.update(req.params.key, req.body.val, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return

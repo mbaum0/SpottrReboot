@@ -6,6 +6,13 @@ import vuetify from './plugins/vuetify';
 import VueSocketIO from 'vue-socket.io'
 import router from './router'
 
+import VueLayers from 'vuelayers'
+import 'vuelayers/lib/style.css'
+
+Vue.use(VueLayers, {
+  dataProjection: 'EPSG:4326'
+})
+
 Vue.config.productionTip = false
 
 Vue.use(new VueSocketIO({

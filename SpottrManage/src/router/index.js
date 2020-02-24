@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 //import Home from '../views/Home.vue'
 import HelloWorld from '../components/HelloWorld'
-import Logs from '../components/Logs'
+//import Logs from '../components/Logs'
 
 Vue.use(VueRouter)
 

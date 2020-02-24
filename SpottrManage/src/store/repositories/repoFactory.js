@@ -4,6 +4,7 @@ import masterNodeRepo from "./masterNodeRepo";
 import slaveNodeRepo from "./slaveNodeRepo";
 import parkingSpotRepo from "./parkingSpotRepo";
 import dbLogRepo from "./dbLogRepo";
+import preferenceRepo from "./preferenceRepo";
 
 const repositories = {
     spottrSite: spottrSiteRepo,
@@ -11,7 +12,8 @@ const repositories = {
     masterNode: masterNodeRepo,
     slaveNode: slaveNodeRepo,
     parkingSpot: parkingSpotRepo,
-    dbLog: dbLogRepo
+    dbLog: dbLogRepo,
+    preference: preferenceRepo
 };
 
 export const repositoryFactory = {

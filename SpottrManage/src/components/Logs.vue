@@ -24,15 +24,6 @@ export default {
   },
   computed: {
     ...mapState(["spottrSites", "dbLogs"]),
-    ...mapGetters(["spottrSites"])
-  },
-  mounted() {
-    this.$store.dispatch("fetchAllSpottrSites");
-    this.$store.dispatch("fetchAllParkingLots");
-    this.$store.dispatch("fetchAllMasterNodes");
-    this.$store.dispatch("fetchAllSlaveNodes");
-    this.$store.dispatch("fetchAllParkingSpots");
-    this.$store.dispatch("fetchAllDbLogs");
   },
   methods: {
     getErrColor (err) {

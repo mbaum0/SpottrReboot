@@ -9,22 +9,23 @@ const masterNodeRepo = repositoryFactory.get('masterNode');
 const slaveNodeRepo = repositoryFactory.get('slaveNode');
 const parkingSpotRepo = repositoryFactory.get('parkingSpot');
 const dbLogRepo = repositoryFactory.get('dbLog');
+const preferenceRepo = repositoryFactory.get('preference')
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    activeSite: null,
     spottrSites: [],
     parkingLots: [],
     masterNodes: [],
     slaveNodes: [],
     parkingSpots: [],
     dbLogs: [],
-    navigationPage: "dashboard",
+    preferences: {},
   },
   mutations: {
-    SOCKET_DBLOG(state, data)
-    {
+    SOCKET_DBLOG(state, data) {
       state.dbLogs.push(data)
     },
     SET_SPOTTRSITES(state, spottrSites) {
@@ -45,8 +46,11 @@ export default new Vuex.Store({
     SET_DBLOGS(state, dbLogs) {
       state.dbLogs = dbLogs
     },
-    SET_NAVIGATIONPAGE(state, page) {
-      state.navigationPage = page
+    SET_PREFERENCES(state, preferences) {
+      state.preferences = preferences
+    },
+    SET_ACTIVESITE(state, site) {
+      state.activeSite = site;
     }
   },
   actions: {
@@ -68,10 +72,13 @@ export default new Vuex.Store({
     async fetchAllDbLogs({ commit }) {
       commit('SET_DBLOGS', (await dbLogRepo.fetchAll()).data.DbLogs)
     },
-    
-    setNavigationPage({ commit }, page) {
-      commit('SET_NAGIVATIONPAGE', page)
+    async fetchAllPreferences( { commit }) {
+      commit('SET_PREFERENCES', (await preferenceRepo.fetchAll()).data.Preferences)
+    },
+    setActiveSite({ commit }, site) {
+      commit('SET_ACTIVESITE', site)
     }
+  
   },
   getters: {
     spottrSites: state => {
