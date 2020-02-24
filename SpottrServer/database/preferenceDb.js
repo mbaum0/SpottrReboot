@@ -1,7 +1,7 @@
 const CREATE_PREFERENCE_TABLE = `CREATE TABLE Preference (key TEXT PRIMARY KEY,
                                                           val TEXT);`
 
-const INSERT_PREFERENCE = `INSERT INTO Preferences (key, val) VALUES (?, ?);`
+const INSERT_PREFERENCE = `INSERT INTO Preference (key, val) VALUES (?, ?);`
 const UPDATE_PREFERENCE = `UPDATE Preference SET val=? WHERE key=?;`
 const SELECT_ALL_PREFERENCE = `SELECT * FROM Preference;`
 const SELECT_PREFERENCE = `SELECT * FROM Preference WHERE key=?;`
@@ -21,7 +21,7 @@ exports.init = (dbHandle) => {
     })
 }
 
-exports.insert = (key, value) => {
+exports.insert = (key, value, callback) => {
     db.run(INSERT_PREFERENCE, [key, value], function (err) {
         dbLogDb.insert("INSERT", "Preference", key, err, `key: ${key}, value: ${value}`)
         exports.select(key, (err, row) => {
@@ -53,7 +53,7 @@ exports.delete = (key, callback) => {
     })
 }
 
-exports.update = (key, value) => {
+exports.update = (key, value, callback) => {
     db.run(UPDATE_PREFERENCE, [value, key], (err) => {
         dbLogDb.insert("UPDATE", "Preference", this.lastID, err, `key: ${key}, value: ${value}`)
         exports.select(key, (err, row) => {
