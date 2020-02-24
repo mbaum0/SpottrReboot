@@ -16,6 +16,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     activeSite: null,
+    activeParkingLot: 0,
     spottrSites: [],
     parkingLots: [],
     masterNodes: [],
@@ -51,6 +52,9 @@ export default new Vuex.Store({
     },
     SET_ACTIVESITE(state, site) {
       state.activeSite = site;
+    },
+    SET_ACTIVEPARKINGLOT(state, lot) {
+      state.activeParkingLot = lot;
     }
   },
   actions: {
@@ -77,6 +81,9 @@ export default new Vuex.Store({
     },
     setActiveSite({ commit }, site) {
       commit('SET_ACTIVESITE', site)
+    },
+    setActiveParkingLot({ commit }, lot) {
+      commit('SET_ACTIVEPARKINGLOT', lot)
     }
   
   },
