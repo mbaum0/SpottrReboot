@@ -8,25 +8,9 @@
       <v-spacer />
 
       <span class="title">
-        Site:
-        <span v-if="activeSite" class="font-italic">{{ activeSite.sitename  }} [{{ activeSite.address }}]</span>
+        <span v-if="preferences.defaultSpottrSite" class="font-italic">{{ spottrSites[preferences.defaultSpottrSite].sitename  }} [{{ spottrSites[preferences.defaultSpottrSite].address }}]</span>
       </span>
 
-      <v-menu left bottom>
-        <template v-slot:activator="{ on }">
-          <v-btn icon v-on="on">
-            <v-icon>mdi-dots-horizontal</v-icon>
-          </v-btn>
-        </template>
-
-        <v-list>
-          <template v-for="site in spottrSites">
-            <v-list-item v-bind:key="site.sitename" @click="setActiveSite(site)">
-              <v-list-item-title>{{ site.sitename }}</v-list-item-title>
-            </v-list-item>
-          </template>
-        </v-list>
-      </v-menu>
     </v-app-bar>
 
     <v-navigation-drawer fixed app clipped>
@@ -65,10 +49,10 @@ export default {
   name: "App",
   props: {},
   computed: {
-    ...mapState(["spottrSites", "activeSite"])
+    ...mapState(["spottrSites", "preferences"])
   },
   methods: {
-    ...mapActions(["setActiveSite"])
+    ...mapActions([""])
   },
   mounted() {
     this.$store.dispatch("fetchAllSpottrSites");

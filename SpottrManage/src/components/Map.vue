@@ -14,7 +14,7 @@
         :rotation.sync="rotation"
       ></vl-view>
 
-      <vl-layer-vector id="draw-pane" v-if="editLot">
+      <vl-layer-vector id="draw-pane" v-if="drawLot">
         <!-- <vl-source-vector ident="draw-target" :features.sync="drawnFeatures"> -->
         <vl-source-vector ident="draw-target" :features.sync="drawnFeatures">
           <vl-style-box>
@@ -25,16 +25,16 @@
       </vl-layer-vector>
 
       <vl-interaction-draw
-        v-if="editLot"
+        v-if="drawLot"
         @drawend="onDrawStop()"
         @drawstart="onDrawStart()"
         source="draw-target"
         type="Polygon"
       ></vl-interaction-draw>
-      <vl-interaction-modify v-if="editLot" source="draw-target"></vl-interaction-modify>
-      <vl-interaction-snap v-if="editLot" source="draw-target" :priority="10"></vl-interaction-snap>
+      <vl-interaction-modify v-if="drawLot" source="draw-target"></vl-interaction-modify>
+      <vl-interaction-snap v-if="drawLot" source="draw-target" :priority="10"></vl-interaction-snap>
 
-      <vl-feature v-if="currentLot && !editLot">
+      <vl-feature v-if="currentLot && !drawLot">
         <vl-geom-polygon :coordinates="currentLot"></vl-geom-polygon>
                   <vl-style-box>
             <vl-style-stroke color="green" :width="2"></vl-style-stroke>
@@ -47,12 +47,12 @@
       </vl-layer-tile>
     </vl-map>
 
-    <v-snackbar v-model="editLot" :top="false" :timeout="0">
+    <v-snackbar v-model="drawLot" :top="false" :timeout="0">
       Editing lot
       <v-btn color="pink" :disabled="drawing" text @click="$emit('lotSave');">Save</v-btn>
     </v-snackbar>
 
-    <v-overlay :z-index="-1" :value="editLot"></v-overlay>
+    <v-overlay :z-index="-1" :value="drawLot"></v-overlay>
   </div>
 </template>
 
@@ -61,9 +61,9 @@ import { mapState, mapGetters, mapActions } from "vuex";
 import GeoJSON from "../../node_modules/ol/format/GeoJSON";
 export default {
   name: "lotMap",
-  props: ["parkingLot", "editLot"],
+  props: ["parkingLot", "drawLot"],
   watch: {
-    editLot: function(newVal, oldVal) {
+    drawLot: function(newVal, oldVal) {
       if (newVal) {
         console.log("start edit");
       } else {
@@ -75,18 +75,18 @@ export default {
       }
     },
     parkingLot: function(newValue, oldVal) {
-      //this.drawnFeatures = [];
-      //this.onDrawStart()
       var oldPoly = {
         type: "Feature",
-        id: "1010101",
+        id: "0",
         geometry: {
           type: "Polygon",
           coordinates: JSON.parse(this.parkingLot.perimeter)
         }
       };
+      if (oldPoly.geometry.coordinates == null){
+        oldPoly.geometry.coordinates = [[]]
+      }
       this.drawnFeatures[0] = oldPoly;
-      console.log("new lot");
       this.currentLot = JSON.parse(this.parkingLot.perimeter);
     }
   },

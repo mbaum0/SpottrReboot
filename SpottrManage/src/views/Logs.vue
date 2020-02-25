@@ -1,6 +1,6 @@
 <template>
-    <v-content center>
-      <v-container fill-height fluid  child-flex>
+    <v-content>
+      <v-container   child-flex>
         <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="dbLogs" class="elevation-1">
           <template v-slot:item.note="{ item }">
             <v-chip v-if="item.error" :color="getErrColor(item.error)" dark>ERR: {{ item.note }}</v-chip>

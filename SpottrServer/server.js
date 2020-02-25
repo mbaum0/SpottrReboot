@@ -27,8 +27,8 @@ app.get("/", (req, res, next) => {
     database.spottrSiteDb.insert("Walmart", "110 Jefferson Road", ()=>{})
     database.spottrSiteDb.insert("Dave and Busters", "97 Jefferson Road", ()=>{})
 
-    database.parkingLotDb.insert("CARLSON LOWER", 1, "[]", ()=>{})
-    database.parkingLotDb.insert("CARLSON UPPER", 1, "[]", ()=>{})
+    database.parkingLotDb.insert("CARLSON LOWER", 1, null, ()=>{})
+    database.parkingLotDb.insert("CARLSON UPPER", 1, null, ()=>{})
 
     database.spottrNodeDb.insert_MasterNodeComplete("MASTER0", 1, "ANYWHERE", 3, "domain1.com", ()=>{})
     database.spottrNodeDb.insert_MasterNodeComplete("MASTER1", 2, "ANYWHERE", 3, "domain2.com", ()=>{})
@@ -482,7 +482,7 @@ app.patch("/api/parkingspots/:id", (req, res, next) => {
 })
 
 app.patch("/api/preferences/:key", (req, res, next) => {
-    database.preferenceDb.update(req.params.key, req.body.val, (err, row) => {
+    database.preferenceDb.update(req.params.key, req.query.val, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return

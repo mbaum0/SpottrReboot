@@ -12,4 +12,7 @@ export default {
     create(payload) {
         return repo.post(`${resource}`, payload)
     },
+    update(id, payload) {
+        return repo.patch(`${resource}/${id}`, payload)
+    }
 }

@@ -15,7 +15,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    activeSite: null,
     activeParkingLot: 0,
     spottrSites: [],
     parkingLots: [],
@@ -38,6 +37,9 @@ export default new Vuex.Store({
     ADD_PARKINGLOT(state, lot) {
       state.parkingLots.push(lot)
     },
+    UPDATE_PARKINGLOT(state, payload) {
+      state.parkingLots[payload[0]] = payload[1];
+    },
     SET_MASTERNODES(state, masterNodes) {
       state.masterNodes = masterNodes
     },
@@ -52,9 +54,6 @@ export default new Vuex.Store({
     },
     SET_PREFERENCES(state, preferences) {
       state.preferences = preferences
-    },
-    SET_ACTIVESITE(state, site) {
-      state.activeSite = site;
     },
     SET_ACTIVEPARKINGLOT(state, lot) {
       state.activeParkingLot = lot;
@@ -85,9 +84,6 @@ export default new Vuex.Store({
     async fetchAllPreferences( { commit }) {
       commit('SET_PREFERENCES', (await preferenceRepo.fetchAll()).data.Preferences)
     },
-    setActiveSite({ commit }, site) {
-      commit('SET_ACTIVESITE', site)
-    },
     setActiveParkingLot({ commit }, lot) {
       commit('SET_ACTIVEPARKINGLOT', lot)
     },
@@ -95,8 +91,11 @@ export default new Vuex.Store({
       commit('SET_ACTIVEPARKINGLOT_PERIMETER', perimeter)
     },
     async createParkingLot({ commit }, params) {
-      let newLot = (await parkingLotRepo.create(params)).data.ParkingSpot
-      commit('ADD_PARKINGLOT', newLot)
+      commit('ADD_PARKINGLOT', (await parkingLotRepo.create(params)).data)
+    },
+    async updateParkingLot({ commit }, payload) {
+      console.log(payload)
+      commit('UPDATE_PARKINGLOT', (await parkingLotRepo.update(payload[0], payload[1])).data)
     }
   
   },
