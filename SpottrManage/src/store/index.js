@@ -55,6 +55,9 @@ export default new Vuex.Store({
     },
     SET_ACTIVEPARKINGLOT(state, lot) {
       state.activeParkingLot = lot;
+    },
+    SET_ACTIVEPARKINGLOT_PERIMETER(state, perimeter) {
+      state.parkingLots[state.activeParkingLot].perimeter = perimeter;
     }
   },
   actions: {
@@ -84,6 +87,9 @@ export default new Vuex.Store({
     },
     setActiveParkingLot({ commit }, lot) {
       commit('SET_ACTIVEPARKINGLOT', lot)
+    },
+    setActiveParkingLotPerimeter({ commit }, perimeter) {
+      commit('SET_ACTIVEPARKINGLOT_PERIMETER', perimeter)
     }
   
   },

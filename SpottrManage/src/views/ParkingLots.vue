@@ -28,7 +28,7 @@
                   </v-list-item-content>
 
                   <v-list-item-action>
-                    <v-btn icon @click>
+                    <v-btn icon @click="editLot=true">
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                   </v-list-item-action>
@@ -38,8 +38,8 @@
           </v-card>
         </v-col>
         <v-col cols="9">
-          <v-card class="pa-2" outlined tile style="height:100%">
-            <vuelayers-map v-bind:parkingLot="parkingLots[activeParkingLot]"></vuelayers-map>
+          <v-card class="pa-2" outlined tile style="height:100%; z-index:10">
+            <vuelayers-map v-bind:parkingLot="parkingLots[activeParkingLot]" v-bind:editLot="editLot" @lotSave="editLot=false" ></vuelayers-map>
           </v-card>
         </v-col>
       </v-row>
@@ -74,6 +74,8 @@ export default {
   components: {
     "vuelayers-map": Maps
   },
-  data: () => ({})
+  data: () => ({
+    editLot: false,
+  })
 };
 </script>
