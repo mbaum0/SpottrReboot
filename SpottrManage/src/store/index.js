@@ -35,6 +35,9 @@ export default new Vuex.Store({
     SET_PARKINGLOTS(state, parkingLots) {
       state.parkingLots = parkingLots
     },
+    ADD_PARKINGLOT(state, lot) {
+      state.parkingLots.push(lot)
+    },
     SET_MASTERNODES(state, masterNodes) {
       state.masterNodes = masterNodes
     },
@@ -90,6 +93,10 @@ export default new Vuex.Store({
     },
     setActiveParkingLotPerimeter({ commit }, perimeter) {
       commit('SET_ACTIVEPARKINGLOT_PERIMETER', perimeter)
+    },
+    async createParkingLot({ commit }, params) {
+      let newLot = (await parkingLotRepo.create(params)).data.ParkingSpot
+      commit('ADD_PARKINGLOT', newLot)
     }
   
   },

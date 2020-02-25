@@ -295,7 +295,7 @@ app.post("/api/spottrsites", (req, res, next) => {
     })
 })
 
-app.post("/api/parkinglot", (req, res, next) => {
+app.post("/api/parkinglots", (req, res, next) => {
     database.parkingLotDb.insert(req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })

@@ -11,5 +11,5 @@ export default {
     },
     create(payload) {
         return repo.post(`${resource}`, payload)
-    }
+    },
 }
