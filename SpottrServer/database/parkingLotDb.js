@@ -64,10 +64,6 @@ exports.delete = (id, callback) => {
 }
 
 exports.update = (id, lotname, spottrsite, perimeter, callback) => {
-    console.log(id)
-    console.log(lotname)
-    console.log(spottrsite)
-    console.log(perimeter)
     db.run(UPDATE_PARKINGLOT, [lotname, spottrsite, perimeter, id], (err) => {
         dbLogDb.insert("UPDATE", "ParkingLot", id, err, `lotname: ${lotname}, spottrsite: ${spottrsite}, perimeter: ${perimeter}`)
         exports.select(id, (err, row) => {

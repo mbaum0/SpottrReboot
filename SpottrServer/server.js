@@ -442,6 +442,7 @@ app.patch("/api/spottrsites/:id", (req, res, next) => {
 })
 
 app.patch("/api/parkinglots/:id", (req, res, next) => {
+    //console.log(req.body)
     database.parkingLotDb.update(req.params.id, req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })

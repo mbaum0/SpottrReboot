@@ -54,7 +54,7 @@
                   </v-list-item-content>
 
                   <v-list-item-action>
-                    <v-btn icon @click="editLot=true">
+                    <v-btn icon @click="activeParkingLot=i; editLot=true">
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                   </v-list-item-action>
@@ -125,7 +125,7 @@ export default {
     createNewLot() {
       var params = {
         lotname: this.newLotName,
-        spottrsite: this.preferences['defaultSpottrSite'],
+        spottrsite: this.$store.state.preferences.defaultSpottrSite,
         perimeter: null
       };
       this.createParkingLot(params);
@@ -141,11 +141,12 @@ export default {
     saveParkingLot() {
       var params = {
         lotname: this.parkingLots[this.activeParkingLot].lotname,
-        spottrsite: this.preferences['defaultSpottrSite'],
+        spottrsite: this.preferences.defaultSpottrSite,
         perimeter: this.parkingLots[this.activeParkingLot].perimeter
       }
-      
-      this.updateParkingLot([this.activeParkingLot, params])
+
+      var lotId = this.parkingLots[this.activeParkingLot].id
+      this.updateParkingLot([lotId, params])
     }
   },
   components: {

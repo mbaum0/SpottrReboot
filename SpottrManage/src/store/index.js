@@ -94,7 +94,6 @@ export default new Vuex.Store({
       commit('ADD_PARKINGLOT', (await parkingLotRepo.create(params)).data)
     },
     async updateParkingLot({ commit }, payload) {
-      console.log(payload)
       commit('UPDATE_PARKINGLOT', (await parkingLotRepo.update(payload[0], payload[1])).data)
     }
   
