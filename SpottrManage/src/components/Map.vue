@@ -61,8 +61,14 @@ import { mapState, mapGetters, mapActions } from "vuex";
 import GeoJSON from "../../node_modules/ol/format/GeoJSON";
 export default {
   name: "lotMap",
-  props: ["parkingLot", "drawLot"],
+  props: ["parkingLot", "drawLot", "mapCenter"],
   watch: {
+    mapCenter: function(newVal, oldVal) {
+      if (newVal != null) {
+        this.center = newVal;
+        this.zoom = 18;
+      }
+    },
     drawLot: function(newVal, oldVal) {
       if (newVal) {
         console.log("start edit");
