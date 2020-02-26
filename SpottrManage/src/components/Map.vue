@@ -36,10 +36,10 @@
 
       <vl-feature v-if="currentLot && !drawLot">
         <vl-geom-polygon :coordinates="currentLot"></vl-geom-polygon>
-                  <vl-style-box>
-            <vl-style-stroke color="green" :width="2"></vl-style-stroke>
-            <vl-style-fill color="rgba(255,200,255,0.2)"></vl-style-fill>
-          </vl-style-box>
+        <vl-style-box>
+          <vl-style-stroke color="orange" :width="3"></vl-style-stroke>
+          <vl-style-fill color="rgba(255,200,255,0.1)"></vl-style-fill>
+        </vl-style-box>
       </vl-feature>
 
       <vl-layer-tile id="bingmaps">
@@ -68,8 +68,8 @@ export default {
         this.center = newVal;
         this.zoom = 18;
       } else {
-        this.center = [-77.675083, 43.084469]
-        this.zoom = 16
+        this.center = [-77.675083, 43.084469];
+        this.zoom = 16;
       }
     },
     drawLot: function(newVal, oldVal) {
@@ -84,19 +84,21 @@ export default {
       }
     },
     parkingLot: function(newValue, oldVal) {
-      var oldPoly = {
-        type: "Feature",
-        id: "0",
-        geometry: {
-          type: "Polygon",
-          coordinates: JSON.parse(this.parkingLot.perimeter)
+      if (this.parkingLot) {
+        var oldPoly = {
+          type: "Feature",
+          id: "0",
+          geometry: {
+            type: "Polygon",
+            coordinates: JSON.parse(this.parkingLot.perimeter)
+          }
+        };
+        if (oldPoly.geometry.coordinates == null) {
+          oldPoly.geometry.coordinates = [[]];
         }
-      };
-      if (oldPoly.geometry.coordinates == null){
-        oldPoly.geometry.coordinates = [[]]
+        this.drawnFeatures[0] = oldPoly;
+        this.currentLot = JSON.parse(this.parkingLot.perimeter);
       }
-      this.drawnFeatures[0] = oldPoly;
-      this.currentLot = JSON.parse(this.parkingLot.perimeter);
     }
   },
   methods: {
@@ -104,12 +106,9 @@ export default {
     onDrawStart() {
       this.drawnFeatures = [];
       this.drawing = true;
-      console.log("start");
-      //this.drawnFeatures[0] = oldPoly;
     },
     onDrawStop() {
       this.drawing = false;
-      console.log("done");
     }
   },
   data() {

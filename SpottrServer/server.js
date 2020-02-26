@@ -30,16 +30,16 @@ app.get("/", (req, res, next) => {
     database.parkingLotDb.insert("CARLSON LOWER", 1, null, ()=>{})
     database.parkingLotDb.insert("CARLSON UPPER", 1, null, ()=>{})
 
-    database.spottrNodeDb.insert_MasterNodeComplete("MASTER0", 1, "ANYWHERE", 3, "domain1.com", ()=>{})
-    database.spottrNodeDb.insert_MasterNodeComplete("MASTER1", 2, "ANYWHERE", 3, "domain2.com", ()=>{})
+    database.spottrNodeDb.insert_MasterNodeComplete("MASTER0", 1, "ANYWHERE", 3, "NONE", "domain1.com", ()=>{})
+    database.spottrNodeDb.insert_MasterNodeComplete("MASTER1", 2, "ANYWHERE", 3, "NONE", "domain2.com", ()=>{})
 
-    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE1", 1, "TOP LEFT", 3, 1, ()=>{})
-    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE2", 1, "TOP CENTER", 3, 1, ()=>{})
-    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE3", 1, "TOP RIGHT", 3, 1, ()=>{})
+    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE1", 1, "TOP LEFT", 3, "NONE", 1, ()=>{})
+    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE2", 1, "TOP CENTER", 3, "NONE", 1, ()=>{})
+    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE3", 1, "TOP RIGHT", 3, "NONE", 1, ()=>{})
 
-    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE4", 2, "TOP LEFT", 3, 2, ()=>{})
-    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE5", 2, "TOP CENTER", 3, 2, ()=>{})
-    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE6", 2, "TOP RIGHT", 3, 2, ()=>{})
+    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE4", 2, "TOP LEFT", 3, "NONE", 2, ()=>{})
+    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE5", 2, "TOP CENTER", 3, "NONE", 2, ()=>{})
+    database.spottrNodeDb.insert_SlaveNodeComplete("SLAVE6", 2, "TOP RIGHT", 3, "NONE", 2, ()=>{})
 
     database.parkingSpotDb.insert("a0", 1, 0, 0, 76.01, 81.01, ()=>{})
     database.parkingSpotDb.insert("a1", 1, 1, 0, 76.01, 81.01, ()=>{})
@@ -306,7 +306,7 @@ app.post("/api/parkinglots", (req, res, next) => {
 })
 
 app.post("/api/masternodes", (req, res, next) => {
-    database.spottrNodeDb.insert_MasterNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.hostname, (err, row) => {
+    database.spottrNodeDb.insert_MasterNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return
@@ -316,7 +316,7 @@ app.post("/api/masternodes", (req, res, next) => {
 })
 
 app.post("/api/slavenodes", (req, res, next) => {
-    database.spottrNodeDb.insert_SlaveNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.masternode, (err, row) => {
+    database.spottrNodeDb.insert_SlaveNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.masternode, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return
@@ -453,7 +453,7 @@ app.patch("/api/parkinglots/:id", (req, res, next) => {
 })
 
 app.patch("/api/maternodes/:id", (req, res, next) => {
-    database.spottrNodeDb.update_MasterNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.hostname, (err, row) => {
+    database.spottrNodeDb.update_MasterNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return
@@ -463,7 +463,7 @@ app.patch("/api/maternodes/:id", (req, res, next) => {
 })
 
 app.patch("/api/slavenodes/:id", (req, res, next) => {
-    database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.masternode, (err, row) => {
+    database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.masternode, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return

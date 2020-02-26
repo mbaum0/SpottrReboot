@@ -3,6 +3,7 @@ const CREATE_SPOTTRNODE_TABLE = `CREATE TABLE SpottrNode (id INTEGER PRIMARY KEY
     parkinglot INTEGER,
     location TEXT,
     numsensors INTEGER,
+    spottruuid TEXT,
     FOREIGN KEY (parkinglot) REFERENCES ParkingLot (id) ON DELETE CASCADE);`
 
 const CREATE_MASTERNODE_TABLE = `CREATE TABLE MasterNode (id INTEGER PRIMARY KEY,
@@ -15,11 +16,11 @@ const CREATE_SLAVENODE_TABLE = `CREATE TABLE SlaveNode (id INTEGER PRIMARY KEY,
   FOREIGN KEY (masternode) REFERENCES MasterNode (id));`
 
 
-const INSERT_SPOTTRNODE = `INSERT INTO SpottrNode (nodename, parkinglot, location, numsensors) VALUES (?, ?, ?, ?);`
+const INSERT_SPOTTRNODE = `INSERT INTO SpottrNode (nodename, parkinglot, location, numsensors, spottruuid) VALUES (?, ?, ?, ?, ?);`
 const INSERT_MASTERNODE = `INSERT INTO MasterNode (id, hostname) VALUES (?, ?);`
 const INSERT_SLAVENODE = `INSERT INTO SlaveNode (id, masternode) VALUES (?, ?);`
 
-const UPDATE_SPOTTRNODE = `UPDATE SpottrNode SET nodename=COALESCE(?, nodename), parkinglot=COALESCE(?, parkinglot), location=COALESCE(?, location), numsensors=COALESCE(?, numsensors) WHERE id=?;`
+const UPDATE_SPOTTRNODE = `UPDATE SpottrNode SET nodename=COALESCE(?, nodename), parkinglot=COALESCE(?, parkinglot), location=COALESCE(?, location), numsensors=COALESCE(?, numsensors), spottruuid=COALESCE(?, spottruuid) WHERE id=?;`
 const UPDATE_MASTERNODE = `UPDATE MasterNode SET hostname=COALESCE(?, hostname), WHERE id=?;`
 const UPDATE_SLAVENODE = `UPDATE SlaveNode SET masternode=COALESCE(?, masternode), WHERE id=?;`
 
@@ -66,8 +67,8 @@ exports.init = (dbHandle) => {
     });
 }
 
-exports.insert_SpottrNode = (name, parkinglot, location, numsensors, callback) => {
-    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+exports.insert_SpottrNode = (name, parkinglot, location, numsensors, spottruuid, callback) => {
+    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors, spottruuid], function (err) {
         dbLogDb.insert("INSERT", "SpottrNode", this.lastID, err, null)
         exports.select(this.lastID, (err, row) => {
             callback(err, row)
@@ -93,9 +94,9 @@ exports.insert_SlaveNode = (id, masternode, callback) => {
     })
 }
 
-exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hostname, callback) => {
-    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
-        dbLogDb.insert("INSERT", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
+exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, spottruuid, hostname, callback) => {
+    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors, spottruuid], function (err) {
+        dbLogDb.insert("INSERT", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottruuid: ${spottruuid}`)
         db.run(INSERT_MASTERNODE, [this.lastID, hostname], function (err) {
             dbLogDb.insert("INSERT", "MasterNode", this.lastID, err, `hostname: ${hostname}`)
             exports.select_MasterNode(this.lastID, (err, row) => {
@@ -105,9 +106,9 @@ exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, hos
     })
 }
 
-exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, masternode, callback) => {
+exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, spottruuid, masternode, callback) => {
     db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
-        dbLogDb.insert("INSERT", "SpottNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
+        dbLogDb.insert("INSERT", "SpottNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottruuid: ${spottruuid}`)
         db.run(INSERT_SLAVENODE, [this.lastID, masternode], function (err) {
             dbLogDb.insert("INSERT", "SlaveNode", this.lastID, err, `masternode: ${masternode}`)
             exports.select_SlaveNode(this.lastID, (err, row) => {
@@ -189,9 +190,9 @@ exports.delete_SpottrNode = (id, callback) => {
     })
 }
 
-exports.update_MasterNode = (id, name, parkinglot, location, numsensors, hostname, callback) => {
+exports.update_MasterNode = (id, name, parkinglot, location, numsensors, spottruuid, hostname, callback) => {
     db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
-        dbLogDb.insert("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
+        dbLogDb.insert("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottruuid: ${spottruuid}`)
         db.run(UPDATE_MASTERNODE, [hostname, id], function (err) {
             dbLogDb.insert("UPDATE", "MasterNode", this.lastID, err, `hostname: ${hostname}`)
             exports.select_MasterNode(id, (err, row) => {
@@ -201,9 +202,9 @@ exports.update_MasterNode = (id, name, parkinglot, location, numsensors, hostnam
     })
 }
 
-exports.update_SlaveNode = (id, name, parkinglot, location, numsensors, masternode, callback) => {
+exports.update_SlaveNode = (id, name, parkinglot, location, numsensors, spottruuid, masternode, callback) => {
     db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
-        dbLogDb.insert("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}`)
+        dbLogDb.insert("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottruuid: ${spottruuid}`)
         db.run(UPDATE_SLAVENODE, [masternode, id], function (err) {
             dbLogDb.insert("UPDATE", "SlaveNode", this.lastID, err, `masternode: ${masternode}`)
             exports.select_SlaveNode(id, (err, row) => {

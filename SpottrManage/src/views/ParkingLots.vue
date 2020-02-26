@@ -89,7 +89,7 @@
         <v-col cols="9">
           <v-card class="pa-2" outlined tile :style="getMapCardStyle()">
             <vuelayers-map
-              v-bind:parkingLot="parkingLots[activeParkingLot]"
+              v-bind:parkingLot="getActiveParkingLot()"
               v-bind:drawLot="drawLot"
               @lotSave="drawLot=false"
               :mapCenter="mapCenter"
@@ -134,6 +134,13 @@ export default {
         this.$refs.newLotNameField.focus();
       })
     },
+    getActiveParkingLot() {
+      if (this.activeParkingLot != null) {
+        return this.parkingLots[this.activeParkingLot];
+      }else {
+        return null;
+      }
+    },
     createNewLot() {
       var params = {
         lotname: this.newLotName,
@@ -145,7 +152,7 @@ export default {
     },
     setFeatureCenter() {
       var lot = this.parkingLots[this.activeParkingLot];
-      if (lot.perimeter != null) {
+      if (lot != null && lot.perimeter != null) {
         var coords = JSON.parse(lot.perimeter)[0];
         var long = 0;
         var lat = 0;
@@ -181,6 +188,9 @@ export default {
     delParkingLot() {
       var lotId = this.parkingLots[this.activeParkingLot].id;
       this.deleteParkingLot(lotId)
+
+      // change the active lot
+      this.activeParkingLot = null;
     },
   },
   components: {
