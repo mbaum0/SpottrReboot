@@ -67,6 +67,9 @@ export default {
       if (newVal != null) {
         this.center = newVal;
         this.zoom = 18;
+      } else {
+        this.center = [-77.675083, 43.084469]
+        this.zoom = 16
       }
     },
     drawLot: function(newVal, oldVal) {

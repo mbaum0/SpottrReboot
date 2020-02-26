@@ -9,7 +9,7 @@
 
               <v-spacer></v-spacer>
 
-              <v-btn icon @click="addLot=true">
+              <v-btn icon @click="addLot=true; focusNewLotField()">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </v-toolbar>
@@ -36,9 +36,10 @@
                 @click:append="drawLot=true"
               ></v-text-field>
               <v-btn class="ml-2" @click="editLot=false; saveParkingLot()">Save</v-btn>
+              <v-btn class="ml-2" @click="editLot=false; delParkingLot()">Delete</v-btn>
             </v-form>
 
-            <v-list v-if="editLot==false">
+            <v-list v-if="editLot==false" style="max-height: 70vh" class="overflow-y-auto">
               <v-list-item-group color="primary" mandatory v-model="activeParkingLot">
                 <v-list-item v-for="(lot, i) in parkingLots" :key="i">
                   <v-list-item-icon v-if="parkingLots[i].perimeter == null">
@@ -64,7 +65,7 @@
               <v-divider v-if="addLot" />
               <v-list-item v-if="addLot">
                 <v-list-item-content>
-                  <v-text-field v-model="newLotName" label="Lot Name" required></v-text-field>
+                  <v-text-field v-model="newLotName" ref='newLotNameField' label="Lot Name" required></v-text-field>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item v-if="addLot">
@@ -76,6 +77,7 @@
                   <v-btn
                     :disabled="newLotName.length == 0"
                     color="primary"
+                    ref="createLotBtn"
                     text
                     @click="addLot=false; createNewLot();"
                   >Save</v-btn>
@@ -115,7 +117,7 @@ export default {
     activeParkingLot: {
       set: function(lot) {
         this.setActiveParkingLot(lot);
-        this.calcFeatureCenter();
+        this.setFeatureCenter();
       },
       get: function() {
         return this.$store.state.activeParkingLot;
@@ -123,7 +125,15 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["setActiveParkingLot", "createParkingLot", "updateParkingLot"]),
+    ...mapActions(["setActiveParkingLot", "createParkingLot", "updateParkingLot", "deleteParkingLot"]),
+    focusNewLotField() {
+      // timeout to wait for field existance
+      setTimeout(() => {
+        // scroll to button and focus on field
+        this.$refs.createLotBtn.$el.scrollIntoView()
+        this.$refs.newLotNameField.focus();
+      })
+    },
     createNewLot() {
       var params = {
         lotname: this.newLotName,
@@ -133,18 +143,23 @@ export default {
       this.createParkingLot(params);
       this.newLotName = "";
     },
-    calcFeatureCenter() {
-      var coords = JSON.parse(this.parkingLots[this.activeParkingLot].perimeter)[0];
-      var long = 0;
-      var lat = 0;
-      // minus one because of duplicated final coordinate
-      for(let i = 0; i < coords.length-1; i++) {
-        long += coords[i][0];
-        lat += coords[i][1]
+    setFeatureCenter() {
+      var lot = this.parkingLots[this.activeParkingLot];
+      if (lot.perimeter != null) {
+        var coords = JSON.parse(lot.perimeter)[0];
+        var long = 0;
+        var lat = 0;
+        // minus one because of duplicated final coordinate
+        for(let i = 0; i < coords.length-1; i++) {
+          long += coords[i][0];
+          lat += coords[i][1]
+        }
+        long /= coords.length-1;
+        lat /= coords.length-1;
+        this.mapCenter = [long, lat]
+      } else {
+        this.mapCenter = null;
       }
-      long /= coords.length-1;
-      lat /= coords.length-1;
-      this.mapCenter = [long, lat]
     },
     getMapCardStyle() {
       if (this.drawLot) {
@@ -162,7 +177,11 @@ export default {
 
       var lotId = this.parkingLots[this.activeParkingLot].id
       this.updateParkingLot([lotId, params])
-    }
+    },
+    delParkingLot() {
+      var lotId = this.parkingLots[this.activeParkingLot].id;
+      this.deleteParkingLot(lotId)
+    },
   },
   components: {
     "vuelayers-map": Maps

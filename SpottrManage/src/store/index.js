@@ -40,6 +40,14 @@ export default new Vuex.Store({
     UPDATE_PARKINGLOT(state, payload) {
       state.parkingLots[payload[0]] = payload[1];
     },
+    DELETE_PARKINGLOT(state, payload) {
+      let id = payload[0];
+      let numDeleted = payload[1];
+
+      state.parkingLots = state.parkingLots.filter(function (obj) {
+        return obj.id != id;
+      })
+    },
     SET_MASTERNODES(state, masterNodes) {
       state.masterNodes = masterNodes
     },
@@ -95,6 +103,9 @@ export default new Vuex.Store({
     },
     async updateParkingLot({ commit }, payload) {
       commit('UPDATE_PARKINGLOT', (await parkingLotRepo.update(payload[0], payload[1])).data)
+    },
+    async deleteParkingLot({ commit }, id) {
+      commit('DELETE_PARKINGLOT', [id, (await parkingLotRepo.delete(id)).data])
     }
   
   },

@@ -14,5 +14,8 @@ export default {
     },
     update(id, payload) {
         return repo.patch(`${resource}/${id}`, payload)
+    },
+    delete(id) {
+        return repo.delete(`${resource}/${id}`)
     }
 }
