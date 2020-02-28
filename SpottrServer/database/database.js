@@ -2,6 +2,7 @@ const sqlite3 = require('sqlite3').verbose()
 
 const spottrSiteDb = require('./spottrSiteDb')
 const parkingLotDb = require('./parkingLotDb')
+const spottrSyncDb = require('./spottrSyncDb')
 const spottrNodeDb = require('./spottrNodeDb')
 const parkingSpotDb = require('./parkingSpotDb')
 const dbLogDb = require('./dbLogDb')
@@ -21,6 +22,7 @@ const db = new sqlite3.Database(DBPATH, (err) => {
 
 exports.spottrSiteDb = spottrSiteDb;
 exports.parkingLotDb = parkingLotDb;
+exports.spottrSyncDb = spottrSyncDb;
 exports.spottrNodeDb = spottrNodeDb;
 exports.parkingSpotDb = parkingSpotDb;
 exports.dbLogDb = dbLogDb;
@@ -30,6 +32,7 @@ exports.preferenceDb = preferenceDb;
 exports.createTables = () => {
     spottrSiteDb.init(db);
     parkingLotDb.init(db);
+    spottrSyncDb.init(db);
     spottrNodeDb.init(db);
     parkingSpotDb.init(db);
     dbLogDb.init(db);
