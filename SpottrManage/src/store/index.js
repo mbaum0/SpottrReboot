@@ -10,6 +10,7 @@ const slaveNodeRepo = repositoryFactory.get('slaveNode');
 const parkingSpotRepo = repositoryFactory.get('parkingSpot');
 const dbLogRepo = repositoryFactory.get('dbLog');
 const preferenceRepo = repositoryFactory.get('preference')
+const spottrSyncRepo = repositoryFactory.get('spottrSync')
 
 Vue.use(Vuex);
 
@@ -22,11 +23,15 @@ export default new Vuex.Store({
     slaveNodes: [],
     parkingSpots: [],
     dbLogs: [],
+    spottrSyncs: [],
     preferences: {},
   },
   mutations: {
     SOCKET_DBLOG(state, data) {
       state.dbLogs.push(data)
+    },
+    SOCKET_SPOTTRSYNC(state, data) {
+      state.spottrSyncs.push(data)
     },
     SET_SPOTTRSITES(state, spottrSites) {
       state.spottrSites = spottrSites
@@ -38,7 +43,8 @@ export default new Vuex.Store({
       state.parkingLots.push(lot)
     },
     UPDATE_PARKINGLOT(state, payload) {
-      state.parkingLots[payload[0]] = payload[1];
+      Vue.set(satte.parkingLots, payload[0], payload[1])
+      //state.parkingLots[payload[0]] = payload[1];
     },
     DELETE_PARKINGLOT(state, payload) {
       let id = payload[0];
@@ -62,6 +68,12 @@ export default new Vuex.Store({
     },
     SET_PREFERENCES(state, preferences) {
       state.preferences = preferences
+    },
+    SET_SPOTTRSYNCS(state, spottrSyncs) {
+      state.spottrSyncs = spottrSyncs;
+    },
+    UPDATE_SPOTTRSYNC(state, payload) {
+      Vue.set(state.spottrSyncs, payload[0], payload[1])
     },
     SET_ACTIVEPARKINGLOT(state, lot) {
       state.activeParkingLot = lot;
@@ -92,6 +104,9 @@ export default new Vuex.Store({
     async fetchAllPreferences( { commit }) {
       commit('SET_PREFERENCES', (await preferenceRepo.fetchAll()).data.Preferences)
     },
+    async fetchAllSpottrSyncs({ commit }) {
+      commit('SET_SPOTTRSYNCS', (await spottrSyncRepo.fetchAll()).data.SpottrSyncs)
+    },
     setActiveParkingLot({ commit }, lot) {
       commit('SET_ACTIVEPARKINGLOT', lot)
     },
@@ -102,12 +117,17 @@ export default new Vuex.Store({
       commit('ADD_PARKINGLOT', (await parkingLotRepo.create(params)).data)
     },
     async updateParkingLot({ commit }, payload) {
-      commit('UPDATE_PARKINGLOT', (await parkingLotRepo.update(payload[0], payload[1])).data)
+      // payload is an array 0: index of parkingLot in array, 1: id of the parkingLot, 2: payload object
+      console.log(payload)
+      commit('UPDATE_PARKINGLOT', [payload[0], (await parkingLotRepo.update(payload[1], payload[2])).data])
     },
     async deleteParkingLot({ commit }, id) {
       commit('DELETE_PARKINGLOT', [id, (await parkingLotRepo.delete(id)).data])
+    },
+    async updateSpottrSync({ commit }, payload) {
+      // payload is an array 0: index of syncReq in array, 1: uuid of the synReq, 2: payload object
+      commit('UPDATE_SPOTTRSYNC', [payload[0], (await spottrSyncRepo.update(payload[1], payload[2])).data])
     }
-  
   },
   getters: {
     spottrSites: state => {

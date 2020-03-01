@@ -65,7 +65,12 @@
               <v-divider v-if="addLot" />
               <v-list-item v-if="addLot">
                 <v-list-item-content>
-                  <v-text-field v-model="newLotName" ref='newLotNameField' label="Lot Name" required></v-text-field>
+                  <v-text-field
+                    v-model="newLotName"
+                    ref="newLotNameField"
+                    label="Lot Name"
+                    required
+                  ></v-text-field>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item v-if="addLot">
@@ -125,19 +130,24 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["setActiveParkingLot", "createParkingLot", "updateParkingLot", "deleteParkingLot"]),
+    ...mapActions([
+      "setActiveParkingLot",
+      "createParkingLot",
+      "updateParkingLot",
+      "deleteParkingLot"
+    ]),
     focusNewLotField() {
       // timeout to wait for field existance
       setTimeout(() => {
         // scroll to button and focus on field
-        this.$refs.createLotBtn.$el.scrollIntoView()
+        this.$refs.createLotBtn.$el.scrollIntoView();
         this.$refs.newLotNameField.focus();
-      })
+      });
     },
     getActiveParkingLot() {
       if (this.activeParkingLot != null) {
         return this.parkingLots[this.activeParkingLot];
-      }else {
+      } else {
         return null;
       }
     },
@@ -157,13 +167,13 @@ export default {
         var long = 0;
         var lat = 0;
         // minus one because of duplicated final coordinate
-        for(let i = 0; i < coords.length-1; i++) {
+        for (let i = 0; i < coords.length - 1; i++) {
           long += coords[i][0];
-          lat += coords[i][1]
+          lat += coords[i][1];
         }
-        long /= coords.length-1;
-        lat /= coords.length-1;
-        this.mapCenter = [long, lat]
+        long /= coords.length - 1;
+        lat /= coords.length - 1;
+        this.mapCenter = [long, lat];
       } else {
         this.mapCenter = null;
       }
@@ -180,18 +190,18 @@ export default {
         lotname: this.parkingLots[this.activeParkingLot].lotname,
         spottrsite: this.preferences.defaultSpottrSite,
         perimeter: this.parkingLots[this.activeParkingLot].perimeter
-      }
+      };
 
-      var lotId = this.parkingLots[this.activeParkingLot].id
-      this.updateParkingLot([lotId, params])
+      var lotId = this.parkingLots[this.activeParkingLot].id;
+      this.updateParkingLot([this.activeParkingLot, lotId, params]);
     },
     delParkingLot() {
       var lotId = this.parkingLots[this.activeParkingLot].id;
-      this.deleteParkingLot(lotId)
+      this.deleteParkingLot(lotId);
 
       // change the active lot
       this.activeParkingLot = null;
-    },
+    }
   },
   components: {
     "vuelayers-map": Maps

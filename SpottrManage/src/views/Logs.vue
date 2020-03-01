@@ -1,7 +1,7 @@
 <template>
     <v-content>
-      <v-container   child-flex>
-        <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="dbLogs" class="elevation-1">
+      <v-container>
+        <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="sortedDbLogs" class="elevation-1; logTable">
           <template v-slot:item.note="{ item }">
             <v-chip v-if="item.error" :color="getErrColor(item.error)" dark>ERR: {{ item.note }}</v-chip>
             <v-chip v-else-if="item.note">{{ item.note }}</v-chip>
@@ -24,6 +24,9 @@ export default {
   },
   computed: {
     ...mapState(["spottrSites", "dbLogs"]),
+    sortedDbLogs: function() {
+      return this.dbLogs.sort((a, b) => (a.id < b.id) ? 1 : -1)
+    }
   },
   methods: {
     getErrColor (err) {
@@ -38,11 +41,11 @@ export default {
   },
   data: () => ({
     dbLogHeaders: [
-      { text: "Timestamp", value: "timestamp"},
+      { text: "Time", value: "timestamp"},
       { text: "Event", value: "event", sortable: false},
       { text: "Resource #", value: "res_num", sortable: false},
       { text: "Resource type", value: "type", sortable: false},
-      { text: "Note", value: "note", sortable: false}
+      { text: "Note", value: "note", sortable: false, width: "5%"}
     ]
   })
 };
@@ -50,4 +53,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  .logTable table {
+    table-layout: fixed;
+  }
 </style>

@@ -1,3 +1,5 @@
+const dbLogDb = require('./dbLogDb')
+
 // uuid is the uuid of the actual node
 // state is the approval status of the node
 //  0 - pending
@@ -12,10 +14,10 @@ const CREATE_SPOTTRSYNC_TABLE = `CREATE TABLE SpottrSync (id INTEGER PRIMARY KEY
 const INSERT_SPOTTRSYNC = `INSERT INTO SpottrSync (uuid, state) VALUES (?, ?);`
 const SELECT_ALL_SPOTTRSYNC = `SELECT * FROM SpottrSync;`
 const SELECT_SPOTTRSYNC = `SELECT * FROM SpottrSync WHERE id=?;`
+const SELECT_SPOTTRSYNC_BY_UUID = `SELECT * FROM SpottrSync WHERE uuid=?;`
 const UPDATE_SPOTTRSYNC = `UPDATE SpottrSync SET state=? WHERE id=?;`
 const DELETE_SPOTTRSYNC = `DELETE FROM SpottrSync WHERE id=?;`
 
-const dbLogDb = require('./dbLogDb')
 var db = null
 
 exports.init = (dbHandle) => {
@@ -32,7 +34,7 @@ exports.init = (dbHandle) => {
 exports.insert = (uuid, state, callback) => {
     db.run(INSERT_SPOTTRSYNC, [uuid, state], function (err) {
         dbLogDb.insert("INSERT", "SpottrSync", this.lastID, err, `uuid: ${uuid}, state: ${state}`)
-        exports.elect(this.lastID, (err, row) => {
+        exports.select(this.lastID, (err, row) => {
             callback(err, row)
         })
     })
@@ -46,6 +48,12 @@ exports.selectall = (callback) => {
 
 exports.select = (id, callback) => {
     db.get(SELECT_SPOTTRSYNC, [id], (err, row) => {
+        callback(err, row)
+    })
+}
+
+exports.select_withUUID = (uuid, callback) => {
+    db.get(SELECT_SPOTTRSYNC_BY_UUID, [uuid], (err, row) => {
         callback(err, row)
     })
 }

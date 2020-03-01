@@ -2,7 +2,7 @@ const express = require("express")
 const bodyparser = require("body-parser")
 const cors = require("cors")
 
-//var websock = require("./websock.js")
+const websock = require("./websock.js")
 var database = require("./database/database.js")
 var app = express()
 
@@ -61,7 +61,8 @@ app.get("/", (req, res, next) => {
     database.parkingSpotDb.insert("f1", 6, 1, 0, 76.01, 81.01, ()=>{})
     database.parkingSpotDb.insert("f2", 6, 2, 0, 76.01, 81.01, ()=>{})
 
-    database.preferenceDb.insert("defaultSpottrSite", null, ()=>{})
+    database.preferenceDb.insert("defaultSpottrSite", 0, ()=>{})
+
 });
 
 // ================== SELECT ALL ENDPOINTS =================== //
@@ -149,6 +150,16 @@ app.get("/api/preferences", (req, res, next) => {
     })
 })
 
+app.get("/api/spottrsyncs" , (req, res, next) => {
+    database.spottrSyncDb.selectall((err, rows) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
+            return
+        }
+        res.json({SpottrSyncs: rows})
+    })
+})
+
 // ================== SELECT ONE ENDPOINTS =================== //
 app.get("/api/spottrsites/:id", (req, res, next) => {
     database.spottrSiteDb.select(req.params.id, (err, row) => {
@@ -219,6 +230,16 @@ app.get("/api/preferences/:key", (req, res, next) => {
         let resDict = {}
         resDict[row.key] = row.val
         res.json({ Preference:  resDict });
+    })
+})
+
+app.get("/api/spottrsyncs/:id", (req, res, next) => {
+    database.spottrSyncDb.select(req.params.id, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
+            return
+        }
+        res.json( { SpottrSync: row })
     })
 })
 
@@ -430,6 +451,20 @@ app.delete("/api/preferences/:key", (req, res, next) => {
     })
 })
 
+app.delete("/api/spottrsyncs/:id", (req, res, next) => {
+    database.spottrSyncDb.delete(req.params.id, (err, changes) => {
+        if (err) {
+            res.status(400).json({ "error": err.message })
+        }
+        else if (changes == 0) {
+            res.status(404).json()
+        }
+        else {
+            res.status(204).json()
+        }
+    })
+})
+
 // ==================== UPDATE ENDPOINTS ===================== //
 app.patch("/api/spottrsites/:id", (req, res, next) => {
     database.spottrSiteDb.update(req.params.id, req.body.sitename, req.body.address, (err, row) => {
@@ -442,7 +477,6 @@ app.patch("/api/spottrsites/:id", (req, res, next) => {
 })
 
 app.patch("/api/parkinglots/:id", (req, res, next) => {
-    //console.log(req.body)
     database.parkingLotDb.update(req.params.id, req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -492,9 +526,34 @@ app.patch("/api/preferences/:key", (req, res, next) => {
     })
 })
 
+app.patch("/api/spottrsyncs/:id", (req, res, next) => {
+    database.spottrSyncDb.update(req.params.id, req.body.state, (err, row) => {
+        if (err) {
+            res.status(400).json({ "error": err.message})
+            return
+        }
+        res.json(row)
+    })
+})
+
 // SPOTTR Sync
 app.post("/api/spottrsync", (req, res, next) => {
-    
+    database.spottrSyncDb.select_withUUID(req.body.uuid, (err, row) => {
+        if (row == null){
+            // make a new entry
+            database.spottrSyncDb.insert(req.body.uuid, 0, (err, row) => {
+                // send back the state of the sync
+                res.json({ SpottrSync: row })
+
+                // let the front end know we have a request
+                websock.broadcastSockMsg('SPOTTRSYNC', row)
+            })
+
+        } else {
+            // return the existing entry
+            res.json({ SpottrSync: row })
+        }
+    })
 })
 
 // Default error message
