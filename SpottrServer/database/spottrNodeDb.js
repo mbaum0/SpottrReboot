@@ -3,9 +3,8 @@ const CREATE_SPOTTRNODE_TABLE = `CREATE TABLE SpottrNode (id INTEGER PRIMARY KEY
     parkinglot INTEGER,
     location TEXT,
     numsensors INTEGER,
-    spottrsyncid INTEGER,
-    FOREIGN KEY (parkinglot) REFERENCES ParkingLot (id) ON DELETE CASCADE,
-    FOREIGN KEY (spottrsyncid) REFERENCES SpottrSync (id) ON DELETE SET NULL);`
+    spottrsyncid TEXT,
+    FOREIGN KEY (parkinglot) REFERENCES ParkingLot (id) ON DELETE CASCADE);`
 
 const CREATE_MASTERNODE_TABLE = `CREATE TABLE MasterNode (id INTEGER PRIMARY KEY,
     hostname TEXT,
@@ -37,6 +36,7 @@ const SELECT_SPOTTRNODE_WITH_PARKINGLOT = `SELECT * FROM SpottrNode WHERE parkin
 const SELECT_MASTERNODE_WITH_PARKINGLOT = `SELECT * FROM MasterNode INNER JOIN SpottrNode ON SpottrNode.id = MasterNode.id WHERE parkinglot=?;`
 const SELECT_SLAVENODE_WITH_PARKINGLOT = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE parkinglot=?;`
 const SELECT_SLAVENODE_WITH_MASTERNODE = `SELECT * FROM SlaveNode INNER JOIN SpottrNode on SpottrNode.id = SlaveNode.id WHERE masternode=?;`
+const SELECT_SPOTTRNODE_WITH_SYNCID = `SELECT * FROM SpottrNode WHERE spottrsyncid=?;`
 
 const DELETE_SPOTTRNODE = `DELETE FROM SpottrNode WHERE id=?;`
 
@@ -108,7 +108,7 @@ exports.insert_MasterNodeComplete = (name, parkinglot, location, numsensors, spo
 }
 
 exports.insert_SlaveNodeComplete = (name, parkinglot, location, numsensors, spottrsyncid, masternode, callback) => {
-    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors], function (err) {
+    db.run(INSERT_SPOTTRNODE, [name, parkinglot, location, numsensors, spottrsyncid], function (err) {
         dbLogDb.insert("INSERT", "SpottNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottrsyncid: ${spottrsyncid}`)
         db.run(INSERT_SLAVENODE, [this.lastID, masternode], function (err) {
             dbLogDb.insert("INSERT", "SlaveNode", this.lastID, err, `masternode: ${masternode}`)
@@ -162,6 +162,12 @@ exports.select_SpottrNodeWithParkingLot = (parkinglot, callback) => {
     })
 }
 
+exports.select_SpottrNodeWithSyncID = (syncID, callback) => {
+    db.get(SELECT_SPOTTRNODE_WITH_SYNCID, [syncID], (err, row) => {
+        callback(err, row)
+    })
+}
+
 exports.select_MasterNodeWithParkingLot = (parkinglot, callback) => {
     db.all(SELECT_MASTERNODE_WITH_PARKINGLOT, [parkinglot], (err, row) => {
         callback(err, row)
@@ -192,7 +198,7 @@ exports.delete_SpottrNode = (id, callback) => {
 }
 
 exports.update_MasterNode = (id, name, parkinglot, location, numsensors, spottrsyncid, hostname, callback) => {
-    db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
+    db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, spottrsyncid, id], function (err) {
         dbLogDb.insert("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottrsyncid: ${spottrsyncid}`)
         db.run(UPDATE_MASTERNODE, [hostname, id], function (err) {
             dbLogDb.insert("UPDATE", "MasterNode", this.lastID, err, `hostname: ${hostname}`)
@@ -204,7 +210,7 @@ exports.update_MasterNode = (id, name, parkinglot, location, numsensors, spottrs
 }
 
 exports.update_SlaveNode = (id, name, parkinglot, location, numsensors, spottrsyncid, masternode, callback) => {
-    db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, id], function (err) {
+    db.run(UPDATE_SPOTTRNODE, [name, parkinglot, location, numsensors, spottrsyncid, id], function (err) {
         dbLogDb.insert("UPDATE", "SpottrNode", this.lastID, err, `nodename: ${name}, parkinglot: ${parkinglot}, location: ${location}, numsensors: ${numsensors}, spottrsyncid: ${spottrsyncid}`)
         db.run(UPDATE_SLAVENODE, [masternode, id], function (err) {
             dbLogDb.insert("UPDATE", "SlaveNode", this.lastID, err, `masternode: ${masternode}`)
