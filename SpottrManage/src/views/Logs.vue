@@ -1,6 +1,6 @@
 <template>
     <v-content>
-      <v-container>
+      <v-container fluid>
         <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="sortedDbLogs" class="elevation-1; logTable">
           <template v-slot:item.note="{ item }">
             <v-chip v-if="item.error" :color="getErrColor(item.error)" dark>ERR: {{ item.note }}</v-chip>
@@ -19,9 +19,6 @@ import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "Logs",
-  props: {
-    msg: String
-  },
   computed: {
     ...mapState(["spottrSites", "dbLogs"]),
     sortedDbLogs: function() {

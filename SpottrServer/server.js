@@ -233,8 +233,8 @@ app.get("/api/preferences/:key", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrsyncs/:id", (req, res, next) => {
-    database.spottrSyncDb.select(req.params.id, (err, row) => {
+app.get("/api/spottrsync/:uuid", (req, res, next) => {
+    database.spottrSyncDb.select_withUUID(req.params.uuid, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return
@@ -486,7 +486,7 @@ app.patch("/api/parkinglots/:id", (req, res, next) => {
     })
 })
 
-app.patch("/api/maternodes/:id", (req, res, next) => {
+app.patch("/api/masternodes/:id", (req, res, next) => {
     database.spottrNodeDb.update_MasterNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })

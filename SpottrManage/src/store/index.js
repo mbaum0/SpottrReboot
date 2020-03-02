@@ -43,8 +43,7 @@ export default new Vuex.Store({
       state.parkingLots.push(lot)
     },
     UPDATE_PARKINGLOT(state, payload) {
-      Vue.set(satte.parkingLots, payload[0], payload[1])
-      //state.parkingLots[payload[0]] = payload[1];
+      Vue.set(state.parkingLots, payload[0], payload[1])
     },
     DELETE_PARKINGLOT(state, payload) {
       let id = payload[0];
@@ -57,8 +56,24 @@ export default new Vuex.Store({
     SET_MASTERNODES(state, masterNodes) {
       state.masterNodes = masterNodes
     },
+    DELETE_MASTERNODE(state, payload) {
+      let id = payload[0];
+      let numDeleted = payload[1];
+
+      state.masterNodes = state.masterNodes.filter(function (obj) {
+        return obj.id != id;
+      })
+    },
     SET_SLAVENODES(state, slaveNodes) {
       state.slaveNodes = slaveNodes
+    },
+    DELETE_SLAVENODE(state, payload){
+      let id = payload[0];
+      let numDeleted = payload[1];
+
+      state.slaveNodes = state.slaveNodes.filter(function (obj) {
+        return obj.id != id;
+      })
     },
     SET_PARKINGSPOTS(state, parkingSpots) {
       state.parkingSpots = parkingSpots
@@ -118,11 +133,16 @@ export default new Vuex.Store({
     },
     async updateParkingLot({ commit }, payload) {
       // payload is an array 0: index of parkingLot in array, 1: id of the parkingLot, 2: payload object
-      console.log(payload)
       commit('UPDATE_PARKINGLOT', [payload[0], (await parkingLotRepo.update(payload[1], payload[2])).data])
     },
     async deleteParkingLot({ commit }, id) {
       commit('DELETE_PARKINGLOT', [id, (await parkingLotRepo.delete(id)).data])
+    },
+    async deleteMasterNode({ commit }, id) {
+      commit('DELETE_MASTERNODE', [id, (await masterNodeRepo.delete(id)).data])
+    },
+    async deleteSlaveNode({ commit }, id) {
+      commit('DELETE_SLAVENODE', [id, (await slaveNodeRepo.delete(id)).data])
     },
     async updateSpottrSync({ commit }, payload) {
       // payload is an array 0: index of syncReq in array, 1: uuid of the synReq, 2: payload object

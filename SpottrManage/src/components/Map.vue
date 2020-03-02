@@ -111,6 +111,13 @@ export default {
       this.drawing = false;
     }
   },
+  mounted() {
+    // set lot on page refresh/route change
+    if (this.parkingLot){
+      this.currentLot = JSON.parse(this.parkingLot.perimeter);
+    }
+    
+  },
   data() {
     return {
       zoom: 16,

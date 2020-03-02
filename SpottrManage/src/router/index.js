@@ -21,6 +21,13 @@ const routes = [
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/Logs.vue')
     }
+  },
+  {
+    path: '/spottrnodes',
+    name: 'SpottrNodes',
+    component: function() {
+      return import('../views/SpottrNodes.vue')
+    }
   }
 ]
 

@@ -3,8 +3,8 @@
     <v-container fluid style="height: 100%">
       <v-row style="height: 99%">
         <v-col cols="3">
-          <v-card class="pa-2" outlined tile>
-            <v-toolbar v-if="editLot==false" color="blue" dark>
+          <v-card class="pa-2" outlined tile style="height: 100%">
+            <v-toolbar v-if="editLot==false" color="blue-grey" dark>
               <v-toolbar-title>Parking Lots</v-toolbar-title>
 
               <v-spacer></v-spacer>
@@ -40,19 +40,17 @@
             </v-form>
 
             <v-list v-if="editLot==false" style="max-height: 70vh" class="overflow-y-auto">
-              <v-list-item-group color="primary" mandatory v-model="activeParkingLot">
+              <v-list-item-group color="primary" mandatory v-model="activeParkingLot" no-action>
                 <v-list-item v-for="(lot, i) in parkingLots" :key="i">
                   <v-list-item-icon v-if="parkingLots[i].perimeter == null">
-                    <v-icon color="red">mdi-alert</v-icon>
+                    <v-icon color="red">mdi-alert-box</v-icon>
                   </v-list-item-icon>
 
                   <v-list-item-icon v-if="parkingLots[i].perimeter != null">
                     <v-icon color="green">mdi-hand-okay</v-icon>
                   </v-list-item-icon>
 
-                  <v-list-item-content>
-                    <v-list-item-title v-text="lot.lotname"></v-list-item-title>
-                  </v-list-item-content>
+                  <v-list-item-title>{{lot.lotname}}</v-list-item-title>
 
                   <v-list-item-action>
                     <v-btn icon @click="activeParkingLot=i; editLot=true">
@@ -90,6 +88,12 @@
               </v-list-item>
             </v-list>
           </v-card>
+          <!-- <v-card class="pa-2" outlined tile>
+            <v-toolbar color="blue-grey" dark>
+              <v-toolbar-title>Spottr Nodes</v-toolbar-title>
+            </v-toolbar>
+            
+          </v-card> -->
         </v-col>
         <v-col cols="9">
           <v-card class="pa-2" outlined tile :style="getMapCardStyle()">
@@ -117,7 +121,8 @@ export default {
       "masterNodes",
       "slaveNodes",
       "activeParkingLot",
-      "preferences"
+      "preferences",
+      "parkingSpots"
     ]),
     activeParkingLot: {
       set: function(lot) {
