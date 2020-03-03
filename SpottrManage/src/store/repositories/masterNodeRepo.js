@@ -12,6 +12,9 @@ export default {
     create(payload) {
         return repo.post(`${resource}`, payload)
     },
+    update(id, payload) {
+        return repo.patch(`${resource}/${id}`, payload)
+    },
     delete(id) {
         // deletes happen from the parent spottrnode, hence the different resource
         return repo.delete(`spottrnodes/${id}`)

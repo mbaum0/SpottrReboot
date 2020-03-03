@@ -22,6 +22,10 @@ app.listen(HTTP_PORT, () => {
 
 app.get("/", (req, res, next) => {
     res.json({ "message": "Shit Works!" })
+})
+
+app.get("/populate", (req, res, next) => {
+    res.json({ "message": "Shit Works!" })
     database.spottrSiteDb.insert("RIT", "1 Lomb Memorial Drive", () => { })
     database.spottrSiteDb.insert("Wegmans", "100 Jefferson Road", () => { })
     database.spottrSiteDb.insert("Walmart", "110 Jefferson Road", () => { })
@@ -487,7 +491,7 @@ app.patch("/api/parkinglots/:id", (req, res, next) => {
 })
 
 app.patch("/api/masternodes/:id", (req, res, next) => {
-    database.spottrNodeDb.update_MasterNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
+    database.spottrNodeDb.update_MasterNode(req.params.id, req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return
@@ -497,7 +501,7 @@ app.patch("/api/masternodes/:id", (req, res, next) => {
 })
 
 app.patch("/api/slavenodes/:id", (req, res, next) => {
-    database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.name, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.masternode, (err, row) => {
+    database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.masternode, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
             return

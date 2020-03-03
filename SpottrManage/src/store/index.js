@@ -56,6 +56,9 @@ export default new Vuex.Store({
     SET_MASTERNODES(state, masterNodes) {
       state.masterNodes = masterNodes
     },
+    UPDATE_MASTERNODE(state, payload) {
+      Vue.set(state.masterNodes, payload[0], payload[1])
+    },
     DELETE_MASTERNODE(state, payload) {
       let id = payload[0];
       let numDeleted = payload[1];
@@ -66,6 +69,9 @@ export default new Vuex.Store({
     },
     SET_SLAVENODES(state, slaveNodes) {
       state.slaveNodes = slaveNodes
+    },
+    UPDATE_SLAVENODE(state, payload) {
+      Vue.set(state.slaveNodes, payload[0], payload[1])
     },
     DELETE_SLAVENODE(state, payload){
       let id = payload[0];
@@ -127,6 +133,14 @@ export default new Vuex.Store({
     },
     setActiveParkingLotPerimeter({ commit }, perimeter) {
       commit('SET_ACTIVEPARKINGLOT_PERIMETER', perimeter)
+    },
+    async updateMasterNode({ commit }, payload) {
+      // payload is an array 0: index of masterNode in array, 1: id of the masterNode, 2: payload object
+      commit('UPDATE_MASTERNODE', [payload[0], (await masterNodeRepo.update(payload[1], payload[2])).data])
+    },
+    async updateSlaveNode({ commit }, payload) {
+      // payload is an array 0: index of slaveNode in array, 1: id of the slaveNode, 2: payload object
+      commit('UPDATE_SLAVENODE', [payload[0], (await slaveNodeRepo.update(payload[1], payload[2])).data])
     },
     async createParkingLot({ commit }, params) {
       commit('ADD_PARKINGLOT', (await parkingLotRepo.create(params)).data)

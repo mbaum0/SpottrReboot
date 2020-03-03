@@ -1,6 +1,7 @@
 <template>
     <v-content>
       <v-container fluid>
+        <v-card>
         <v-data-table disable-pagination hide-default-footer :headers="dbLogHeaders" :items="sortedDbLogs" class="elevation-1; logTable">
           <template v-slot:item.note="{ item }">
             <v-chip v-if="item.error" :color="getErrColor(item.error)" dark>ERR: {{ item.note }}</v-chip>
@@ -10,6 +11,7 @@
             <v-chip :color="getMethodColor(item.event)" dark> {{ item.event }}</v-chip>
           </template>
         </v-data-table>
+        </v-card>
       </v-container>
     </v-content>
 </template>
