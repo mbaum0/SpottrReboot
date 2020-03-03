@@ -19,6 +19,7 @@
               hide-default-footer
               :headers="masterNodeHeaders"
               :items="masterNodes"
+              dense
             >
               <template v-slot:item.parkinglot="{ item }">{{getLotName(item.parkinglot)}}</template>
               <template v-slot:item.action="{ item }">
@@ -48,8 +49,10 @@
               hide-default-footer
               :headers="slaveNodeHeaders"
               :items="slaveNodes"
+              dense
             >
               <template v-slot:item.parkinglot="{ item }">{{getLotName(item.parkinglot)}}</template>
+              <template v-slot:item.masternode="{ item }">{{getMasterNodeName(item.masternode)}}</template>
               <template v-slot:item.action="{ item }">
                 <v-btn icon>
                   <v-icon small class="mr-2" @click="editedMaster=false;editNode(item)">mdi-pencil</v-icon>
@@ -64,9 +67,6 @@
       </v-row>
 
       <v-dialog v-model="dialog" max-width="500px">
-        <!-- <template v-slot:activator="{ on }">
-          <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-        </template> -->
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -75,21 +75,26 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="12" sm="6" md="4">
+                <v-col cols="12" sm="12" md="12">
                   <v-text-field v-model="editedNode.nodename" label="Node Name"></v-text-field>
                 </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field v-model="editedNode.parkinglot" label="Parking Lot"></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="4">
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
                   <v-text-field v-model="editedNode.location" label="Location"></v-text-field>
                 </v-col>
-                <!-- <v-col cols="12" sm="6" md="4">
-                  <v-text-field v-model="editedNode.carbs" label="Carbs (g)"></v-text-field>
+                </v-row>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
+                  <v-select
+                    v-model="editedNode.parkinglot"
+                    :items="parkingLots"
+                    item-text="lotname"
+                    item-value="id"
+                    label="Parking Lot"
+                  ></v-select>
                 </v-col>
-                <v-col cols="12" sm="6" md="4">
-                  <v-text-field v-model="editedNode.protein" label="Protein (g)"></v-text-field>
-                </v-col> -->
               </v-row>
             </v-container>
           </v-card-text>
@@ -111,8 +116,8 @@ export default {
   name: "SpottrNodes",
   computed: {
     ...mapState(["masterNodes", "slaveNodes", "parkingLots"]),
-    formTitle () {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+    formTitle() {
+      return this.editedMaster ? "Edit Uplink Node" : "Edit Sensor Node";
     }
   },
   data: () => ({
@@ -120,72 +125,83 @@ export default {
     editedIndex: -1,
     editedMaster: false, // true if editing a master
     editedNode: {
-      nodename: '',
+      nodename: "",
       parkinglot: 0,
-      location: ''
+      location: ""
     },
     defaultItem: {
-      nodename: '',
+      nodename: "",
       parkinglot: 0,
-      location: ''
+      location: ""
     },
     masterNodeHeaders: [
-      { text: "Name", value: "nodename", sortable: false },
+      { text: "Name", value: "nodename", sortable: false, width: "10%" },
       { text: "Parking Lot", value: "parkinglot", sortable: false },
       { text: "Location", value: "location", sortable: false },
       { text: "Number of Sensors", value: "numsensors", sortable: false },
-      { text: "UUID", value: "spottrsyncid", sortable: false },
-      { text: "Actions", value: "action", sortable: false }
+      { text: "UUID", value: "spottrsyncid", sortable: false, width: "10%" },
+      { text: "Actions", value: "action", sortable: false, width: "12%" }
     ],
     slaveNodeHeaders: [
-      { text: "Name", value: "nodename", sortable: false },
+      { text: "Name", value: "nodename", sortable: false, width: "10%" },
       { text: "Master Node", value: "masternode", sortable: false },
       { text: "Parking Lot", value: "parkinglot", sortable: false },
       { text: "Location", value: "location", sortable: false },
       { text: "Number of Sensors", value: "numsensors", sortable: false },
-      { text: "UUID", value: "spottrsyncid", sortable: false },
-      { text: "Actions", value: "action", sortable: false }
+      { text: "UUID", value: "spottrsyncid", sortable: false, width: "10%" },
+      { text: "Actions", value: "action", sortable: false, width: "12%" }
     ]
   }),
   methods: {
-    ...mapActions(["deleteMasterNode", "deleteSlaveNode", "updateMasterNode", "udpateSlaveNode"]),
+    ...mapActions([
+      "deleteMasterNode",
+      "deleteSlaveNode",
+      "updateMasterNode",
+      "updateSlaveNode"
+    ]),
     log(item) {
       console.log(item);
     },
     delMasterNode(dbID) {
-      confirm('Are you sure you want to delete this node?') && this.deleteMasterNode(dbID);
+      confirm("Are you sure you want to delete this node?") &&
+        this.deleteMasterNode(dbID);
     },
     delSlaveNode(dbID) {
-      confirm('Are you sure you want to delete this node?') && this.deleteSlaveNode(dbID);
+      confirm("Are you sure you want to delete this node?") &&
+        this.deleteSlaveNode(dbID);
     },
-    editNode (item) {
-      this.editedIndex = this.masterNodes.indexOf(item)
-      this.editedNode = Object.assign({}, item)
-      this.dialog = true
+    editNode(item) {
+      if (this.editedMaster) {
+        this.editedIndex = this.masterNodes.indexOf(item);
+      } else {
+        this.editedIndex = this.slaveNodes.indexOf(item);
+      }
+      this.editedNode = Object.assign({}, item);
+      this.dialog = true;
     },
     closeDialog() {
-      this.dialog = false
+      this.dialog = false;
       setTimeout(() => {
-        this.editedNode = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      }, 300)
+        this.editedNode = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      }, 300);
     },
-    saveNode () {
+    saveNode() {
       var params = {
         nodename: this.editedNode.nodename,
         parkinglot: this.editedNode.parkinglot,
         location: this.editedNode.location
       };
-      
+
       if (this.editedMaster) {
-        var nodeId = this.masterNodes[this.editedIndex].id
-        this.updateMasterNode([this.editedIndex, nodeId, params])
+        var nodeId = this.masterNodes[this.editedIndex].id;
+        this.updateMasterNode([this.editedIndex, nodeId, params]);
       } else {
-        var nodeId = this.slaveNodes[this.editedIndex].id
-        this.updateSlaveNode([this.editedIndex, nodeId, params])
+        var nodeId = this.slaveNodes[this.editedIndex].id;
+        this.updateSlaveNode([this.editedIndex, nodeId, params]);
       }
       // new item
-      this.closeDialog()
+      this.closeDialog();
     },
     getLotName(dbID) {
       // get the parking lot name from a database ID
@@ -197,11 +213,21 @@ export default {
       } else {
         return null;
       }
+    },
+    getMasterNodeName(dbID) {
+      let masterNodeList = this.masterNodes.filter(function(obj) {
+        return obj.id == dbID;
+      });
+      if (masterNodeList.length > 0) {
+        return masterNodeList[0].nodename;
+      } else {
+        return null;
+      }
     }
   },
   watch: {
-    dialog (val) {
-      val || this.closeDialog()
+    dialog(val) {
+      val || this.closeDialog();
     }
   }
 };
