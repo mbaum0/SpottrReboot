@@ -9,7 +9,7 @@
 
       <span class="title">
         <span
-          v-if="preferences['defaultSpottrSite']"
+          v-if="preferences['defaultSpottrSite'] && spottrSites[preferences.defaultSpottrSite]"
           class="font-italic"
         >{{ spottrSites[preferences.defaultSpottrSite].sitename }} [{{ spottrSites[preferences.defaultSpottrSite].address }}]</span>
       </span>

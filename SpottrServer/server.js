@@ -618,6 +618,9 @@ function updateTopology(masterUUID, reqHost, topology) {
                                 } else {
                                     //successfully added new master node
                                     console.log(`Successfully created new master node ${nodeUUID}`)
+
+                                    // let the front end know we have a new master node
+                                    websock.broadcastSockMsg('MASTERNODE', row)
                                 }
                             })
                         } else if (nodeType === "sensor") {
@@ -635,6 +638,9 @@ function updateTopology(masterUUID, reqHost, topology) {
                                         } else {
                                             // successfully added new slave node
                                             console.log(`Successfully created new slave node ${nodeUUID}`)
+
+                                            // let the front end know we have a new master node
+                                            websock.broadcastSockMsg('SLAVENODE', row)
                                         }
                                     })
                                 }

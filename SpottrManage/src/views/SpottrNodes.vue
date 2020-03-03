@@ -81,12 +81,6 @@
               </v-row>
               <v-row>
                 <v-col cols="12" sm="12" md="12">
-                  <v-text-field v-model="editedNode.location" label="Location"></v-text-field>
-                </v-col>
-                </v-row>
-              </v-row>
-              <v-row>
-                <v-col cols="12" sm="12" md="12">
                   <v-select
                     v-model="editedNode.parkinglot"
                     :items="parkingLots"
@@ -94,6 +88,11 @@
                     item-value="id"
                     label="Parking Lot"
                   ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="12" md="12">
+                  <v-text-field v-model="editedNode.location" label="Location"></v-text-field>
                 </v-col>
               </v-row>
             </v-container>
@@ -135,21 +134,36 @@ export default {
       location: ""
     },
     masterNodeHeaders: [
-      { text: "Name", value: "nodename", sortable: false, width: "10%" },
-      { text: "Parking Lot", value: "parkinglot", sortable: false },
-      { text: "Location", value: "location", sortable: false },
-      { text: "Number of Sensors", value: "numsensors", sortable: false },
-      { text: "UUID", value: "spottrsyncid", sortable: false, width: "10%" },
-      { text: "Actions", value: "action", sortable: false, width: "12%" }
+      { text: "Name", value: "nodename", sortable: false, width: "1%" },
+      { text: "Lot", value: "parkinglot", sortable: false, width: "1%" },
+      { text: "Location", value: "location", sortable: false, width: "1%" },
+      {
+        text: "No. Sensors",
+        value: "numsensors",
+        sortable: false,
+        width: "1%"
+      },
+      { text: "UUID", value: "spottrsyncid", sortable: false, width: "1%" },
+      { text: "Actions", value: "action", sortable: false, width: "1%" }
     ],
     slaveNodeHeaders: [
-      { text: "Name", value: "nodename", sortable: false, width: "10%" },
-      { text: "Master Node", value: "masternode", sortable: false },
-      { text: "Parking Lot", value: "parkinglot", sortable: false },
-      { text: "Location", value: "location", sortable: false },
-      { text: "Number of Sensors", value: "numsensors", sortable: false },
-      { text: "UUID", value: "spottrsyncid", sortable: false, width: "10%" },
-      { text: "Actions", value: "action", sortable: false, width: "12%" }
+      { text: "Name", value: "nodename", sortable: false, width: "1%" },
+      {
+        text: "Master Node",
+        value: "masternode",
+        sortable: false,
+        width: "1%"
+      },
+      { text: "Lot", value: "parkinglot", sortable: false, width: "1%" },
+      { text: "Location", value: "location", sortable: false, width: "1%" },
+      {
+        text: "No. Sensors",
+        value: "numsensors",
+        sortable: false,
+        width: "1%"
+      },
+      { text: "UUID", value: "spottrsyncid", sortable: false, width: "1%" },
+      { text: "Actions", value: "action", sortable: false, width: "11%" }
     ]
   }),
   methods: {

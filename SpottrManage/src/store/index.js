@@ -33,6 +33,14 @@ export default new Vuex.Store({
     SOCKET_SPOTTRSYNC(state, data) {
       state.spottrSyncs.push(data)
     },
+    SOCKET_MASTERNODE(state, data) {
+      //console.log(data)
+      state.masterNodes.push(data)
+    },
+    SOCKET_SLAVENODE(state, data) {
+      //console.log(data)
+      state.slaveNodes.push(data)
+    },
     SET_SPOTTRSITES(state, spottrSites) {
       state.spottrSites = spottrSites
     },
