@@ -49,7 +49,7 @@
 
     <v-snackbar v-model="drawLot" :top="false" :timeout="0">
       Editing lot
-      <v-btn color="pink" :disabled="drawing" text @click="$emit('lotSave');">Save</v-btn>
+      <v-btn color="pink" :disabled="drawing || (drawnFeatures[0] && drawnFeatures[0].geometry.coordinates[0].length == 0)" text @click="$emit('lotSave');">Save</v-btn>
     </v-snackbar>
 
     <v-overlay :z-index="-1" :value="drawLot"></v-overlay>
@@ -74,9 +74,7 @@ export default {
     },
     drawLot: function(newVal, oldVal) {
       if (newVal) {
-        console.log("start edit");
       } else {
-        console.log("stop edit");
         this.currentLot = this.drawnFeatures[0].geometry.coordinates;
         this.setActiveParkingLotPerimeter(
           JSON.stringify(this.drawnFeatures[0].geometry.coordinates)

@@ -20,9 +20,14 @@
               :headers="masterNodeHeaders"
               :items="masterNodes"
             >
+              <template v-slot:item.parkinglot="{ item }">{{getLotName(item.parkinglot)}}</template>
               <template v-slot:item.action="{ item }">
-                <v-icon small class="mr-2" @click="log(item)">mdi-pencil</v-icon>
-                <v-icon small @click="delMasterNode(item.id)">mdi-delete</v-icon>
+                <v-btn icon>
+                  <v-icon small class="mr-2" @click="log(item)">mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn icon>
+                  <v-icon small @click="delMasterNode(item.id)">mdi-delete</v-icon>
+                </v-btn>
               </template>
             </v-data-table>
           </v-card>
@@ -44,9 +49,14 @@
               :headers="slaveNodeHeaders"
               :items="slaveNodes"
             >
+              <template v-slot:item.parkinglot="{ item }">{{getLotName(item.parkinglot)}}</template>
               <template v-slot:item.action="{ item }">
-                <v-icon small class="mr-2" @click="log(item)">mdi-pencil</v-icon>
-                <v-icon small @click="delSlaveNode(item.id)">mdi-delete</v-icon>
+                <v-btn icon>
+                  <v-icon small class="mr-2" @click="log(item)">mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn icon>
+                  <v-icon small @click="delSlaveNode(item.id)">mdi-delete</v-icon>
+                </v-btn>
               </template>
             </v-data-table>
           </v-card>
@@ -61,25 +71,25 @@ import { mapState, mapActions } from "vuex";
 export default {
   name: "SpottrNodes",
   computed: {
-    ...mapState(["masterNodes", "slaveNodes"])
+    ...mapState(["masterNodes", "slaveNodes", "parkingLots"])
   },
   data: () => ({
     masterNodeHeaders: [
-      { text: "Name", value: "nodename", sortable: false},
-      { text: "Parking Lot", value: "parkinglot", sortable: false},
-      { text: "Location", value: "location", sortable: false},
-      { text: "Number of Sensors", value: "numsensors", sortable: false},
-      { text: "UUID", value: "spottrsyncid", sortable: false},
-      { text: "Actions", value: "action", sortable: false}
+      { text: "Name", value: "nodename", sortable: false },
+      { text: "Parking Lot", value: "parkinglot", sortable: false },
+      { text: "Location", value: "location", sortable: false },
+      { text: "Number of Sensors", value: "numsensors", sortable: false },
+      { text: "UUID", value: "spottrsyncid", sortable: false },
+      { text: "Actions", value: "action", sortable: false }
     ],
     slaveNodeHeaders: [
-      { text: "Name", value: "nodename", sortable: false},
-      { text: "Master Node", value: "masternode", sortable: false},
-      { text: "Parking Lot", value: "parkinglot", sortable: false},
-      { text: "Location", value: "location", sortable: false},
-      { text: "Number of Sensors", value: "numsensors", sortable: false},
-      { text: "UUID", value: "spottrsyncid", sortable: false},
-      { text: "Actions", value: "action", sortable: false}
+      { text: "Name", value: "nodename", sortable: false },
+      { text: "Master Node", value: "masternode", sortable: false },
+      { text: "Parking Lot", value: "parkinglot", sortable: false },
+      { text: "Location", value: "location", sortable: false },
+      { text: "Number of Sensors", value: "numsensors", sortable: false },
+      { text: "UUID", value: "spottrsyncid", sortable: false },
+      { text: "Actions", value: "action", sortable: false }
     ]
   }),
   methods: {
@@ -92,6 +102,17 @@ export default {
     },
     delSlaveNode(dbID) {
       this.deleteSlaveNode(dbID);
+    },
+    getLotName(dbID) {
+      // get the parking lot name from a database ID
+      let lots = this.parkingLots.filter(function(obj) {
+        return obj.id == dbID;
+      });
+      if (lots.length > 0) {
+        return lots[0].lotname;
+      } else {
+        return null;
+      }
     }
   }
 };

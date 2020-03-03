@@ -88,12 +88,6 @@
               </v-list-item>
             </v-list>
           </v-card>
-          <!-- <v-card class="pa-2" outlined tile>
-            <v-toolbar color="blue-grey" dark>
-              <v-toolbar-title>Spottr Nodes</v-toolbar-title>
-            </v-toolbar>
-            
-          </v-card> -->
         </v-col>
         <v-col cols="9">
           <v-card class="pa-2" outlined tile :style="getMapCardStyle()">
