@@ -14,7 +14,7 @@ exports.init = (dbHandle) => {
     db = dbHandle;
     db.run(CREATE_PREFERENCE_TABLE, (err) => {
         if (err) {
-            console.log('Preference table already exists')
+            //console.log('Preference table already exists')
         } else {
             console.log('Succesfully created Preference table')
         }

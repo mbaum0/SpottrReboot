@@ -23,7 +23,7 @@ exports.init = (dbHandle) => {
     db = dbHandle;
     db.run(CREATE_DBLOG_TABLE, (err) => {
         if (err) {
-            console.log('DbLog table already exists')
+            //console.log('DbLog table already exists')
         } else {
             console.log('Successfully create DbLog table')
         }

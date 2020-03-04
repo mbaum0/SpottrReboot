@@ -18,7 +18,7 @@ exports.init = (dbHandle) => {
     db = dbHandle;
     db.run(CREATE_PARKINGLOT_TABLE, (err) => {
         if (err) {
-            console.log('ParkingLot table already exists')
+            //console.log('ParkingLot table already exists')
         } else {
             console.log('Successfully created ParkingLot table')
         }

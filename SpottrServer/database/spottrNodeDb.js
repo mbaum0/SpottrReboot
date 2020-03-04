@@ -47,21 +47,21 @@ exports.init = (dbHandle) => {
     db = dbHandle;
     db.run(CREATE_SPOTTRNODE_TABLE, (err) => {
         if (err) {
-            console.log('SpottrNode table already exists')
+            //console.log('SpottrNode table already exists')
         } else {
             console.log('Successfully created SpottrNode table')
         }
     });
     db.run(CREATE_MASTERNODE_TABLE, (err) => {
         if (err) {
-            console.log('MasterNode table already exists')
+            //console.log('MasterNode table already exists')
         } else {
             console.log('Successfully created MasterNode table')
         }
     });
     db.run(CREATE_SLAVENODE_TABLE, (err) => {
         if (err) {
-            console.log('SlaveNode table already exists')
+            //console.log('SlaveNode table already exists')
         } else {
             console.log('Successfully created SlaveNode table')
         }

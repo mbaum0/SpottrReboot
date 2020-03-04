@@ -16,7 +16,7 @@ exports.init = (dbHandle) => {
     db = dbHandle;
     db.run(CREATE_SPOTTRSITE_TABLE, (err) => {
         if (err) {
-            console.log('SpottrSite table already exists')
+            //console.log('SpottrSite table already exists')
         } else {
             console.log('Successfully created SpottrSite table')
         }
