@@ -1,17 +1,19 @@
 const express = require("express")
 const bodyparser = require("body-parser")
 const cors = require("cors")
-
+const jwt = require("jsonwebtoken")
 const websock = require("./websock.js")
-var database = require("./database/database.js")
-var app = express()
+const database = require("./database/database.js")
+const config = require('./config')
+const app = express()
 
 exports.app = app;
 
 app.use(bodyparser.json())
 app.use(cors())
 
-const HTTP_PORT = 8000
+const HTTP_PORT = config.httpPort;
+const jwtSecretKey = config.jwtSecretKey;
 
 database.createTables(() => { });
 
@@ -20,11 +22,55 @@ app.listen(HTTP_PORT, () => {
     console.log("Server running on port %PORT%".replace("%PORT%", HTTP_PORT))
 });
 
-app.get("/", (req, res, next) => {
+app.post('/api/login', (req, res) => {
+    // Fake user (client can set this up through a different endpoint)
+    const user = {
+        id: 1,
+        username: 'spottrmanage',
+        project: 'spottr'
+    }
+    jwt.sign({user: user}, jwtSecretKey, {expiresIn: '7d'}, (err, token) => {
+        res.json({token: token})
+    });
+})
+
+app.post('/api/testauth', verifyToken, (req, res) => {
+    jwt.verify(req.token, jwtSecretKey, (err, authData) => {
+        if (err) {
+            res.sendStatus(403)
+        } else {
+            res.json({message: "Authentication Success", authData})
+        }
+    })
+});
+
+
+// FORMAT OF TOKEN
+// Authorization: Bearer <access_token>
+function verifyToken(req, res, next) {
+    // Get auth header value
+    const bearerHeader = req.headers.authorization;
+    
+    // Check null
+    if (bearerHeader != null) {
+        // Split header at space to get token
+        const bearer = bearerHeader.split(' ');
+        // Get token from arr
+        const bearerToken = bearer[1]
+        // Set the token
+        req.token = bearerToken
+        // go next
+        next()
+    } else {
+        res.sendStatus(403)
+    }
+}
+
+app.get("/", (req, res) => {
     res.json({ "message": "Shit Works!" })
 })
 
-app.get("/populate", (req, res, next) => {
+app.get("/populate", (req, res) => {
     res.json({ "message": "Shit Works!" })
     database.spottrSiteDb.insert("RIT", "1 Lomb Memorial Drive", () => { })
     database.spottrSiteDb.insert("Wegmans", "100 Jefferson Road", () => { })
@@ -70,7 +116,7 @@ app.get("/populate", (req, res, next) => {
 });
 
 // ================== SELECT ALL ENDPOINTS =================== //
-app.get("/api/spottrsites", (req, res, next) => {
+app.get("/api/spottrsites", (req, res) => {
     database.spottrSiteDb.selectall((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -80,7 +126,7 @@ app.get("/api/spottrsites", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglots", (req, res, next) => {
+app.get("/api/parkinglots", (req, res) => {
     database.parkingLotDb.selectall((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -90,7 +136,7 @@ app.get("/api/parkinglots", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrnodes", (req, res, next) => {
+app.get("/api/spottrnodes", (req, res) => {
     database.spottrNodeDb.selectall_SpottrNode((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -100,7 +146,7 @@ app.get("/api/spottrnodes", (req, res, next) => {
     })
 })
 
-app.get("/api/masternodes", (req, res, next) => {
+app.get("/api/masternodes", (req, res) => {
     database.spottrNodeDb.selectall_MasterNode((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -110,7 +156,7 @@ app.get("/api/masternodes", (req, res, next) => {
     })
 })
 
-app.get("/api/slavenodes", (req, res, next) => {
+app.get("/api/slavenodes", (req, res) => {
     database.spottrNodeDb.selectall_SlaveNode((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -120,7 +166,7 @@ app.get("/api/slavenodes", (req, res, next) => {
     })
 })
 
-app.get("/api/parkingspots", (req, res, next) => {
+app.get("/api/parkingspots", (req, res) => {
     database.parkingSpotDb.selectall((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -130,7 +176,7 @@ app.get("/api/parkingspots", (req, res, next) => {
     })
 })
 
-app.get("/api/dblogs", (req, res, next) => {
+app.get("/api/dblogs", (req, res) => {
     database.dbLogDb.selectall((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -140,7 +186,7 @@ app.get("/api/dblogs", (req, res, next) => {
     })
 })
 
-app.get("/api/preferences", (req, res, next) => {
+app.get("/api/preferences", (req, res) => {
     database.preferenceDb.selectall((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -154,7 +200,7 @@ app.get("/api/preferences", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrsyncs", (req, res, next) => {
+app.get("/api/spottrsyncs", (req, res) => {
     database.spottrSyncDb.selectall((err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -165,7 +211,7 @@ app.get("/api/spottrsyncs", (req, res, next) => {
 })
 
 // ================== SELECT ONE ENDPOINTS =================== //
-app.get("/api/spottrsites/:id", (req, res, next) => {
+app.get("/api/spottrsites/:id", (req, res) => {
     database.spottrSiteDb.select(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -175,7 +221,7 @@ app.get("/api/spottrsites/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglots/:id", (req, res, next) => {
+app.get("/api/parkinglots/:id", (req, res) => {
     database.parkingLotDb.select(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -185,7 +231,7 @@ app.get("/api/parkinglots/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrnodes/:id", (req, res, next) => {
+app.get("/api/spottrnodes/:id", (req, res) => {
     database.spottrNodeDb.select_SpottrNode(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -195,7 +241,7 @@ app.get("/api/spottrnodes/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/masternodes/:id", (req, res, next) => {
+app.get("/api/masternodes/:id", (req, res) => {
     database.spottrNodeDb.select_MasterNode(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -205,7 +251,7 @@ app.get("/api/masternodes/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/slavenodes/:id", (req, res, next) => {
+app.get("/api/slavenodes/:id", (req, res) => {
     database.spottrNodeDb.select_SlaveNode(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -215,7 +261,7 @@ app.get("/api/slavenodes/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/parkingspots/:id", (req, res, next) => {
+app.get("/api/parkingspots/:id", (req, res) => {
     database.parkingSpotDb.select(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -225,7 +271,7 @@ app.get("/api/parkingspots/:id", (req, res, next) => {
     })
 })
 
-app.get("/api/preferences/:key", (req, res, next) => {
+app.get("/api/preferences/:key", (req, res) => {
     database.preferenceDb.select(req.params.key, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -237,7 +283,7 @@ app.get("/api/preferences/:key", (req, res, next) => {
     })
 })
 
-app.get("/api/spottrsync/:uuid", (req, res, next) => {
+app.get("/api/spottrsync/:uuid", (req, res) => {
     database.spottrSyncDb.select_withUUID(req.params.uuid, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -249,7 +295,7 @@ app.get("/api/spottrsync/:uuid", (req, res, next) => {
 
 // ================ SELECT FILTER ENDPOINTS ================== //
 
-app.get("/api/spottrsites/:id/parkinglots", (req, res, next) => {
+app.get("/api/spottrsites/:id/parkinglots", (req, res) => {
     database.parkingLotDb.select_withSpottrSite(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -259,7 +305,7 @@ app.get("/api/spottrsites/:id/parkinglots", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglots/:id/spottrnodes", (req, res, next) => {
+app.get("/api/parkinglots/:id/spottrnodes", (req, res) => {
     database.spottrNodeDb.select_SpottrNodeWithParkingLot(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -269,7 +315,7 @@ app.get("/api/parkinglots/:id/spottrnodes", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglots/:id/masternodes", (req, res, next) => {
+app.get("/api/parkinglots/:id/masternodes", (req, res) => {
     database.spottrNodeDb.select_MasterNodeWithParkingLot(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -279,7 +325,7 @@ app.get("/api/parkinglots/:id/masternodes", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglots/:id/slavenodes", (req, res, next) => {
+app.get("/api/parkinglots/:id/slavenodes", (req, res) => {
     database.spottrNodeDb.select_SlaveNodeWithParkingLot(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -289,7 +335,7 @@ app.get("/api/parkinglots/:id/slavenodes", (req, res, next) => {
     })
 })
 
-app.get("/api/parkinglots/:id/parkingspots", (req, res, next) => {
+app.get("/api/parkinglots/:id/parkingspots", (req, res) => {
     database.parkingSpotDb.select_ParkingSpotWithParkingLot(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -299,7 +345,7 @@ app.get("/api/parkinglots/:id/parkingspots", (req, res, next) => {
     })
 })
 
-app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
+app.get("/api/masternodes/:id/slavenodes", (req, res) => {
     database.spottrNodeDb.select_SlaveNodeWithMasterNode(req.params.id, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -310,7 +356,7 @@ app.get("/api/masternodes/:id/slavenodes", (req, res, next) => {
 })
 
 // ==================== INSERT ENDPOINTS ===================== //
-app.post("/api/spottrsites", (req, res, next) => {
+app.post("/api/spottrsites", (req, res) => {
     database.spottrSiteDb.insert(req.body.sitename, req.body.address, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -320,7 +366,7 @@ app.post("/api/spottrsites", (req, res, next) => {
     })
 })
 
-app.post("/api/parkinglots", (req, res, next) => {
+app.post("/api/parkinglots", (req, res) => {
     database.parkingLotDb.insert(req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -330,7 +376,7 @@ app.post("/api/parkinglots", (req, res, next) => {
     })
 })
 
-app.post("/api/masternodes", (req, res, next) => {
+app.post("/api/masternodes", (req, res) => {
     database.spottrNodeDb.insert_MasterNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -340,7 +386,7 @@ app.post("/api/masternodes", (req, res, next) => {
     })
 })
 
-app.post("/api/slavenodes", (req, res, next) => {
+app.post("/api/slavenodes", (req, res) => {
     database.spottrNodeDb.insert_SlaveNodeComplete(req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.masternode, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -350,7 +396,7 @@ app.post("/api/slavenodes", (req, res, next) => {
     })
 })
 
-app.post("/api/parkingspots", (req, res, next) => {
+app.post("/api/parkingspots", (req, res) => {
     database.parkingSpotDb.insert(req.body.spotname, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -360,7 +406,7 @@ app.post("/api/parkingspots", (req, res, next) => {
     })
 })
 
-app.post("/api/preferences", (req, res, next) => {
+app.post("/api/preferences", (req, res) => {
     database.preferenceDb.insert(req.body.key, req.body.val, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -371,7 +417,7 @@ app.post("/api/preferences", (req, res, next) => {
 })
 
 // ==================== DELETE ENDPOINTS ===================== //
-app.delete("/api/spottrsites/:id", (req, res, next) => {
+app.delete("/api/spottrsites/:id", (req, res) => {
     database.spottrSiteDb.delete(req.params.id, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -385,7 +431,7 @@ app.delete("/api/spottrsites/:id", (req, res, next) => {
     })
 })
 
-app.delete("/api/parkinglots/:id", (req, res, next) => {
+app.delete("/api/parkinglots/:id", (req, res) => {
     database.parkingLotDb.delete(req.params.id, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -399,7 +445,7 @@ app.delete("/api/parkinglots/:id", (req, res, next) => {
     })
 })
 
-app.delete("/api/spottrnodes/:id", (req, res, next) => {
+app.delete("/api/spottrnodes/:id", (req, res) => {
     database.spottrNodeDb.delete_SpottrNode(req.params.id, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -413,7 +459,7 @@ app.delete("/api/spottrnodes/:id", (req, res, next) => {
     })
 })
 
-app.delete("/api/parkingspots/:id", (req, res, next) => {
+app.delete("/api/parkingspots/:id", (req, res) => {
     database.parkingSpotDb.delete(req.params.id, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -427,7 +473,7 @@ app.delete("/api/parkingspots/:id", (req, res, next) => {
     })
 })
 
-app.delete("/api/dblogs", (req, res, next) => {
+app.delete("/api/dblogs", (req, res) => {
     database.dbLogDb.delete((err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -441,7 +487,7 @@ app.delete("/api/dblogs", (req, res, next) => {
     })
 })
 
-app.delete("/api/preferences/:key", (req, res, next) => {
+app.delete("/api/preferences/:key", (req, res) => {
     database.preferenceDb.delete(req.params.key, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -455,7 +501,7 @@ app.delete("/api/preferences/:key", (req, res, next) => {
     })
 })
 
-app.delete("/api/spottrsyncs/:id", (req, res, next) => {
+app.delete("/api/spottrsyncs/:id", (req, res) => {
     database.spottrSyncDb.delete(req.params.id, (err, changes) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -470,7 +516,7 @@ app.delete("/api/spottrsyncs/:id", (req, res, next) => {
 })
 
 // ==================== UPDATE ENDPOINTS ===================== //
-app.patch("/api/spottrsites/:id", (req, res, next) => {
+app.patch("/api/spottrsites/:id", (req, res) => {
     database.spottrSiteDb.update(req.params.id, req.body.sitename, req.body.address, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -480,7 +526,7 @@ app.patch("/api/spottrsites/:id", (req, res, next) => {
     })
 })
 
-app.patch("/api/parkinglots/:id", (req, res, next) => {
+app.patch("/api/parkinglots/:id", (req, res) => {
     database.parkingLotDb.update(req.params.id, req.body.lotname, req.body.spottrsite, req.body.perimeter, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -490,7 +536,7 @@ app.patch("/api/parkinglots/:id", (req, res, next) => {
     })
 })
 
-app.patch("/api/masternodes/:id", (req, res, next) => {
+app.patch("/api/masternodes/:id", (req, res) => {
     database.spottrNodeDb.update_MasterNode(req.params.id, req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.hostname, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -500,7 +546,7 @@ app.patch("/api/masternodes/:id", (req, res, next) => {
     })
 })
 
-app.patch("/api/slavenodes/:id", (req, res, next) => {
+app.patch("/api/slavenodes/:id", (req, res) => {
     database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.nodename, req.body.parkinglot, req.body.location, req.body.numsensors, req.body.spottruuid, req.body.masternode, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -510,7 +556,7 @@ app.patch("/api/slavenodes/:id", (req, res, next) => {
     })
 })
 
-app.patch("/api/parkingspots/:id", (req, res, next) => {
+app.patch("/api/parkingspots/:id", (req, res) => {
     database.spottrNodeDb.update_SlaveNode(req.params.id, req.body.name, req.body.spottrnode, req.body.sensornum, req.body.occupied, req.body.longitude, req.body.latitude, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -520,7 +566,7 @@ app.patch("/api/parkingspots/:id", (req, res, next) => {
     })
 })
 
-app.patch("/api/preferences/:key", (req, res, next) => {
+app.patch("/api/preferences/:key", (req, res) => {
     database.preferenceDb.update(req.params.key, req.query.val, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -530,7 +576,7 @@ app.patch("/api/preferences/:key", (req, res, next) => {
     })
 })
 
-app.patch("/api/spottrsyncs/:id", (req, res, next) => {
+app.patch("/api/spottrsyncs/:id", (req, res) => {
     database.spottrSyncDb.update(req.params.id, req.body.state, (err, row) => {
         if (err) {
             res.status(400).json({ "error": err.message })
@@ -541,7 +587,7 @@ app.patch("/api/spottrsyncs/:id", (req, res, next) => {
 })
 
 // SPOTTR Sync
-app.post("/api/spottrsync", (req, res, next) => {
+app.post("/api/spottrsync", (req, res) => {
     database.spottrSyncDb.select_withUUID(req.body.uuid, (err, row) => {
         if (row == null) {
             // if the uuid is not defined, return a failure
@@ -566,7 +612,7 @@ app.post("/api/spottrsync", (req, res, next) => {
 })
 
 // SPOTTR SyncTopology
-app.post("/api/toposync/:uuid", (req, res, next) => {
+app.post("/api/toposync/:uuid", (req, res) => {
     if (req.body.SyncTopology == null) {
         // uh oh
         res.status(422).json({ "error": "POST body is missing SyncTopology field" })
@@ -578,7 +624,7 @@ app.post("/api/toposync/:uuid", (req, res, next) => {
 })
 
 // Default error message
-app.get("/api/error", (req, res, next) => {
+app.get("/api/error", (req, res) => {
     res.status(400).json({ "error": "sample error message" })
 })
 

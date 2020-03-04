@@ -1,9 +1,9 @@
 const app = require('./server').app;
-
+const config = require('./config')
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
-const SOCK_PORT = 8001
+const SOCK_PORT = config.socketPort
 
 // io.on('connection', function connection(ws) {
 //     console.log('new client')
